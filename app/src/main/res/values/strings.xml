@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">tpo_mobile</string>
+    <string name="home_title">WorkNow</string>
+    <string name="home_subtitle">Bienvenido!</string>
+    <string name="home_thirdtitle">Reservá. Entrená. Repetí</string>
+    <string name="home_login">Inicia Sesión</string>
+    <string name="home_signUp">Registrate</string>
 </resources>

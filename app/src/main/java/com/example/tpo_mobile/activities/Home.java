@@ -1,4 +1,4 @@
 package com.example.tpo_mobile.activities;
 
-public class AllClassesActivity {
+public class Home {
 }
