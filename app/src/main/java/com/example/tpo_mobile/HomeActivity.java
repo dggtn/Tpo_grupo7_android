@@ -1,16 +1,20 @@
 package com.example.tpo_mobile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tpo_mobile.services.AppService;
 
-public class MainActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
         private static final String TAG = "ActivityLifecycle";
 
+        private Button login;
 
         AppService appService;
 
@@ -21,8 +25,12 @@ public class MainActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             Log.d(TAG, "⭐ onCreate: La Activity está siendo creada");
             setContentView(R.layout.activity_home);
-
-            };
+            login =  findViewById(R.id.home_login);
+            login.setOnClickListener((View view)->{
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+            });
+        };
 
 
 

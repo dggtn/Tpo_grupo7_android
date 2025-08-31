@@ -7,7 +7,7 @@
     android:background="#D5C5C5">
 
     <Button
-        android:id="@+id/hom_login"
+        android:id="@+id/home_login"
         android:layout_width="176dp"
         android:layout_height="93dp"
         android:backgroundTint="#03A9F4"

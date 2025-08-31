@@ -5,4 +5,5 @@
     <string name="home_thirdtitle">Reservá. Entrená. Repetí</string>
     <string name="home_login">Inicia Sesión</string>
     <string name="home_signUp">Registrate</string>
+    <string name="email_Input">Ingresa tu email:</string>
 </resources>
