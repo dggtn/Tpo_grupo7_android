@@ -15,6 +15,7 @@ public class HomeActivity extends AppCompatActivity {
         private static final String TAG = "ActivityLifecycle";
 
         private Button login;
+        private Button signUp;
 
         AppService appService;
 
@@ -28,6 +29,11 @@ public class HomeActivity extends AppCompatActivity {
             login =  findViewById(R.id.home_login);
             login.setOnClickListener((View view)->{
                 Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+            });
+            signUp =  findViewById(R.id.home_signUp);
+            signUp.setOnClickListener((View view)->{
+                Intent intent = new Intent(HomeActivity.this, SignUpActivity.class);
                 startActivity(intent);
             });
         };
