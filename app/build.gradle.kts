@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.tpo_mobile"
-        minSdk = 21
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -34,6 +34,9 @@ android {
 
     lint {
         abortOnError = false
+    }
+    hilt {
+        namespace = "com.example.tpo_mobile"
     }
 }
 

@@ -1,26 +1,17 @@
 package com.example.tpo_mobile;
 
-import static android.os.Build.VERSION_CODES_FULL.R;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-import com.example.tpo_mobile.R;
-import com.example.tpo_mobile.services.AppService;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
-import dagger.hilt.android.AndroidEntryPoint;
 
-@AndroidEntryPoint
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.tpo_mobile.services.AppService;
+
 public class MainActivity extends AppCompatActivity {
         private static final String TAG = "ActivityLifecycle";
 
-        @Inject
+
         AppService appService;
 
     private ArrayAdapter<String> adapter;
@@ -29,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             Log.d(TAG, "⭐ onCreate: La Activity está siendo creada");
-            setContentView(R.);
+            setContentView(R.layout.activity_home);
 
             };
 
