@@ -3,14 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mainActivity">
 
-    <activity
-        android:id="@+id/mainActivity"
-        android:name="com.example.tpo_mobile.MainActivity"
-        android:label="main"
-        tools:layout="@layout/main_activity">
-    </activity>
+    app:startDestination="@id/loginFragment">
 
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.tpo_mobile.LoginFragment"
+        android:label="form signUp"
+        tools:layout="@layout/fragment_login">
+
+    </fragment>
 
 </navigation>
