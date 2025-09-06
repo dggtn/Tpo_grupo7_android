@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.cardview)
     val fragment_version = "1.8.9"
     implementation(libs.material)
 
@@ -67,7 +68,8 @@ dependencies {
 
     //biometria
     implementation("androidx.biometric:biometric:1.1.0")
-
+//material design
+    implementation("com.google.android.material:material:<version>")
 
 
 }

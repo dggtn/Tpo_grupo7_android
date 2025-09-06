@@ -5,10 +5,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 public class LoginFragment extends Fragment {
 
@@ -28,8 +30,19 @@ public class LoginFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Button button = view.findViewById(R.id.button_acceso);
+        button.setOnClickListener((view1)->{
+            Navigation.findNavController(view1).navigate(R.id.entrarHome, new Bundle());
+        });
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         Log.d("login fragment","On start login fragment");
     }
+
+
 }
