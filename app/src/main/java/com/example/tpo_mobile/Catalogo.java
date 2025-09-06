@@ -5,14 +5,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-public class PantallaPrincipalFragment extends Fragment {
+public class Catalogo extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d("pantalla fragment","On create pantalla fragment");
@@ -24,13 +24,13 @@ public class PantallaPrincipalFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_pantalla_principal, container, false);
+        return inflater.inflate(R.layout.fragmentcatalogo_clases, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ImageButton button = view.findViewById(R.id.imageButton2);
+       Button button = view.findViewById(R.id.button_inscribirse);
         button.setOnClickListener((view1)->{
             Navigation.findNavController(view1).navigate(R.id.curso, new Bundle());
         });

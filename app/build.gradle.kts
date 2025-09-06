@@ -69,7 +69,7 @@ dependencies {
     //biometria
     implementation("androidx.biometric:biometric:1.1.0")
 //material design
-    implementation("com.google.android.material:material:<version>")
+    implementation("com.google.android.material:material:1.5.0")
 
 
 }

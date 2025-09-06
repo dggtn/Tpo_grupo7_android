@@ -17,4 +17,10 @@
     <string name="ingresa_tu_email">Ingresa tu email:</string>
     <string name="enviar_c_digo">Enviar Código</string>
     <string name="recuperar_acceso">Recuperar acceso</string>
+    <string name="content_description_media" />
+    <string name="title" />
+    <string name="secondary_text" />
+    <string name="supporting_text" />
+    <string name="action_1" />
+    <string name="action_2" />
 </resources>

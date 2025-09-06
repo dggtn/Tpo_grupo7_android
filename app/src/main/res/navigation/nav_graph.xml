@@ -12,13 +12,13 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/entrarHome"
-           app:destination="@+id/fragment_pantalla_principal"/>
+           app:destination="@+id/fragmentcatalogo"/>
     </fragment>
     <fragment
-        android:id="@+id/fragment_pantalla_principal"
-        android:name="com.example.tpo_mobile.PantallaPrincipalFragment"
-        android:label="pantalla principal"
-        tools:layout="@layout/fragment_login">
+        android:id="@+id/fragmentcatalogo"
+        android:name="com.example.tpo_mobile.Catalogo"
+        android:label="fragmentcatalogo"
+        tools:layout="@layout/fragmentcatalogo_clases">
         <action
             android:id="@+id/curso"
             app:destination="@+id/fragment_detalle_curso"/>
