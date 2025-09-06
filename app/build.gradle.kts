@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.tpo_mobile"
+    namespace = "com.uade.tpo_mobile"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.tpo_mobile"
+        applicationId = "com.uade.tpo_mobile"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    val fragment_version = "1.8.9"
     implementation(libs.material)
 
 
@@ -52,11 +53,17 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
+    implementation("androidx.fragment:fragment:${fragment_version}")
 
     // Desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     testImplementation(libs.junit)
+
+    //navigation component
+
+    implementation("androidx.navigation:navigation-fragment:2.7.7")
+    implementation("androidx.navigation:navigation-ui:2.7.7")
 
 
 }

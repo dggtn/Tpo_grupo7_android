@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tpo_mobile.services.AppService;
 
-public class HomeActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
         private static final String TAG = "ActivityLifecycle";
 
         private Button login;
@@ -25,15 +25,15 @@ public class HomeActivity extends AppCompatActivity {
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             Log.d(TAG, "⭐ onCreate: La Activity está siendo creada");
-            setContentView(R.layout.activity_home);
+            setContentView(R.layout.activity_main);
             login =  findViewById(R.id.home_login);
             login.setOnClickListener((View view)->{
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
             });
             signUp =  findViewById(R.id.home_signUp);
             signUp.setOnClickListener((View view)->{
-                Intent intent = new Intent(HomeActivity.this, SignUpActivity.class);
+                Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
                 startActivity(intent);
             });
         };
