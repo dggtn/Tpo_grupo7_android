@@ -6,4 +6,15 @@
     <string name="home_login">Inicia Sesión</string>
     <string name="home_signUp">Registrate</string>
     <string name="email_Input">Ingresa tu email:</string>
+    <string name="email">Email:</string>
+    <string name="nombre">Nombre:</string>
+    <string name="confirma_contrasena">Confirma Contrasena:</string>
+    <string name="contrasena">Contrasena:</string>
+    <string name="todo">TODO</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="inicia_sesion">Inicia Sesión</string>
+    <string name="registrate">Registrate</string>
+    <string name="ingresa_tu_email">Ingresa tu email:</string>
+    <string name="enviar_c_digo">Enviar Código</string>
+    <string name="recuperar_acceso">Recuperar acceso</string>
 </resources>
