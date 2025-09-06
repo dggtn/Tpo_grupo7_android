@@ -20,8 +20,15 @@
         android:label="pantalla principal"
         tools:layout="@layout/fragment_login">
         <action
-            android:id="@+id/cursos"
-            app:destination="@+id/fragment_pantalla_principal"/>
+            android:id="@+id/curso"
+            app:destination="@+id/fragment_detalle_curso"/>
+
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_detalle_curso"
+        android:name="com.example.tpo_mobile.DetalleCurso"
+        android:label="detalle curso"
+        tools:layout="@layout/fragment_detalle_curso">
 
     </fragment>
 
