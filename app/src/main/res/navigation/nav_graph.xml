@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-
     app:startDestination="@id/loginFragment">
 
     <fragment
@@ -11,7 +10,6 @@
         android:name="com.example.tpo_mobile.LoginFragment"
         android:label="form signUp"
         tools:layout="@layout/fragment_login">
-
     </fragment>
 
 </navigation>

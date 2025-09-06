@@ -2,28 +2,19 @@ package com.example.tpo_mobile;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tpo_mobile.services.AppService;
-
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "ActivityLifecycle";
     AppService appService;
-    private ArrayAdapter<String> adapter;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "⭐ onCreate: La Activity está siendo creada");
         setContentView(R.layout.main_activity);
-
-    };
-
+    }
     @Override
     protected void onStart() {
         super.onStart();
