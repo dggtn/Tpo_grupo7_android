@@ -16,19 +16,31 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentcatalogo"
-        android:name="com.example.tpo_mobile.Catalogo"
+        android:name="com.example.tpo_mobile.CatalogoFragment"
         android:label="fragmentcatalogo"
         tools:layout="@layout/fragment_curso">
         <action
             android:id="@+id/curso"
             app:destination="@+id/fragment_detalle_curso"/>
+        <action
+            android:id="@+id/alert_reservaste"
+            app:destination="@+id/fragment_dialog_reservaste"/>
 
     </fragment>
     <fragment
         android:id="@+id/fragment_detalle_curso"
-        android:name="com.example.tpo_mobile.DetalleCurso"
+        android:name="com.example.tpo_mobile.DetalleCursoFragment"
         android:label="detalle curso"
         tools:layout="@layout/fragment_detalle_curso">
+
+
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_dialog_reservaste"
+        android:name="com.example.tpo_mobile.DialogFragment"
+        android:label="fragmentReserva"
+        tools:layout="@layout/fragment_dialog_reservaste">
+
 
     </fragment>
 

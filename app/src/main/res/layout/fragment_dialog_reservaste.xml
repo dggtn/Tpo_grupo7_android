@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/alert_reservaste"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#34A3E7"
+    android:foregroundTint="#3F51B5"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+
+    <TextView
+        android:id="@+id/dialogTexto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reserva realizada con exito"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="64dp"
+        tools:layout_editor_absoluteY="42dp" />
+
+    <Button
+        android:id="@+id/dialogButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:backgroundTint="#0B5B99"
+        android:text="Aceptar"
+        tools:layout_editor_absoluteX="78dp"
+        tools:layout_editor_absoluteY="99dp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

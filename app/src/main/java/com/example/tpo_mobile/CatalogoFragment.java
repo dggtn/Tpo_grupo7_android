@@ -12,10 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-public class Catalogo extends Fragment {
+public class CatalogoFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d("pantalla fragment","On create pantalla fragment");
+        Log.d("pantalla fragment", "On create pantalla fragment");
 
         super.onCreate(savedInstanceState);
 
@@ -31,9 +31,16 @@ public class Catalogo extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-       Button button = view.findViewById(R.id.verDetalle);
-        button.setOnClickListener((view1)->{
+        Button button = view.findViewById(R.id.verDetalle);
+        button.setOnClickListener((view1) -> {
             Navigation.findNavController(view1).navigate(R.id.curso, new Bundle());
+            ;
+        });
+        Button button2 = view.findViewById(R.id.button_inscribirse);
+        button2.setOnClickListener((view2) -> {
+            Navigation.findNavController(view2).navigate(R.id.alert_reservaste, new Bundle());
+            ;
         });
     }
 }
+
