@@ -36,11 +36,7 @@ public class CatalogoFragment extends Fragment {
             Navigation.findNavController(view1).navigate(R.id.curso, new Bundle());
             ;
         });
-        Button button2 = view.findViewById(R.id.button_inscribirse);
-        button2.setOnClickListener((view2) -> {
-            Navigation.findNavController(view2).navigate(R.id.alert_reservaste, new Bundle());
-            ;
-        });
+
     }
 }
 

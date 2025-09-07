@@ -22,9 +22,6 @@
         <action
             android:id="@+id/curso"
             app:destination="@+id/fragment_detalle_curso"/>
-        <action
-            android:id="@+id/alert_reservaste"
-            app:destination="@+id/fragment_dialog_reservaste"/>
 
     </fragment>
     <fragment
@@ -32,7 +29,9 @@
         android:name="com.example.tpo_mobile.DetalleCursoFragment"
         android:label="detalle curso"
         tools:layout="@layout/fragment_detalle_curso">
-
+        <action
+            android:id="@+id/alert_reservaste"
+            app:destination="@+id/fragment_dialog_reservaste"/>
 
     </fragment>
     <fragment

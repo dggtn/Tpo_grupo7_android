@@ -24,7 +24,7 @@
         <!-- Media -->
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="188dp"
             android:layout_height="wrap_content"
             android:background="#A7AFDE"
             android:backgroundTint="#7CA4C8"
@@ -79,16 +79,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/button_inscribirse"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#4B52AF"
-                android:foregroundTint="#A92828"
-                android:text="Reservar"
-                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/verDetalle"
