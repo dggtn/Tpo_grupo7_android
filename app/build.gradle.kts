@@ -42,6 +42,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.cardview)
+    implementation(libs.androidx.core)
     val fragment_version = "1.8.9"
     implementation(libs.material)
 
