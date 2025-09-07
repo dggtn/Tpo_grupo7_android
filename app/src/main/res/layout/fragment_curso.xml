@@ -5,24 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#A98D8D"
-    android:backgroundTint="#977D7D">
+    android:backgroundTint="#977D7D"
+    android:foregroundTint="#2196F3">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="CURSOOOOOOO"
-        android:textAppearance="?attr/textAppearanceBody2"
-        android:textColor="?android:attr/textColorSecondary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.118"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.022" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#3D4CDC"
         android:orientation="vertical"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -36,8 +26,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#3F51B5"
-            android:backgroundTint="#1C6AA9"
+            android:background="#A7AFDE"
+            android:backgroundTint="#7CA4C8"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -47,6 +37,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/title"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="Pesas"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -81,20 +81,25 @@
             android:orientation="horizontal">
 
             <Button
-                style="?attr/borderlessButtonStyle"
                 android:id="@+id/button_inscribirse"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Inscribirse"
-                />
+                android:backgroundTint="#4B52AF"
+                android:foregroundTint="#A92828"
+                android:text="Inscribirse" />
 
-<!--            <com.google.android.material.button.MaterialButton-->
-<!--                android:id="@+id/verDetalle"-->
-<!--                style="?attr/borderlessButtonStyle"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/action_2"-->
-<!--                app:backgroundTint="#3F51B5" />-->
+            <Button
+                android:id="@+id/verDetalle"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Ver Detalle"
+                android:textColor="#E6DCDC"
+                android:textColorHint="#FAEBEB"
+                android:textColorLink="#F6F4F4"
+                android:textStyle="bold"
+                app:backgroundTint="#7786DB" />
         </LinearLayout>
 
     </LinearLayout>

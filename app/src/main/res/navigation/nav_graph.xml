@@ -18,7 +18,7 @@
         android:id="@+id/fragmentcatalogo"
         android:name="com.example.tpo_mobile.Catalogo"
         android:label="fragmentcatalogo"
-        tools:layout="@layout/fragmentcatalogo_clases">
+        tools:layout="@layout/fragment_curso">
         <action
             android:id="@+id/curso"
             app:destination="@+id/fragment_detalle_curso"/>
