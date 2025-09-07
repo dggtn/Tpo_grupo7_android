@@ -32,7 +32,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Button button = view.findViewById(R.id.button_acceso);
+        Button button = view.findViewById(R.id.buttonIniciaSesion);
         button.setOnClickListener((view1)->{
             Navigation.findNavController(view1).navigate(R.id.entrarHome, new Bundle());
         });

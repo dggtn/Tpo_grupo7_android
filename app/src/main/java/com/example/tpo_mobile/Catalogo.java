@@ -21,6 +21,7 @@ public class Catalogo extends Fragment {
 
     }
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -30,7 +31,7 @@ public class Catalogo extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-       Button button = view.findViewById(R.id.button_inscribirse);
+       Button button = view.findViewById(R.id.verDetalle);
         button.setOnClickListener((view1)->{
             Navigation.findNavController(view1).navigate(R.id.curso, new Bundle());
         });

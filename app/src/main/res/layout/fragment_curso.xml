@@ -87,7 +87,8 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="#4B52AF"
                 android:foregroundTint="#A92828"
-                android:text="Inscribirse" />
+                android:text="Reservar"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/verDetalle"
