@@ -13,7 +13,13 @@
     <item
         android:id="@+id/fragment_historial"
         android:enabled="true"
-        android:title="@string/historial" />
+        android:color="@color/design_default_color_on_primary"
+        android:title="Historial" />
+    <item
+        android:id="@+id/fragment_proximos_clases"
+        android:enabled="true"
+        android:color="@color/design_default_color_on_primary"
+        android:title="Proximas" />
 
 
 </menu>
