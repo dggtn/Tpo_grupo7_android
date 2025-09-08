@@ -13,14 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class LoginFragment extends Fragment {
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d("login fragment","On create login fragment");
 
         super.onCreate(savedInstanceState);
-
     }
 
     @Nullable
@@ -36,11 +33,7 @@ public class LoginFragment extends Fragment {
         button.setOnClickListener((view1)->{
             Intent intent = new Intent(getActivity(),AppGymActivity.class);
             startActivity(intent);
-
-
         });
-
-
     }
 
     @Override
@@ -48,6 +41,4 @@ public class LoginFragment extends Fragment {
         super.onStart();
         Log.d("login fragment","On start login fragment");
     }
-
-
 }
