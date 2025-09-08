@@ -10,88 +10,77 @@
 
 
     <LinearLayout
-        android:layout_width="198dp"
-        android:layout_height="375dp"
-        android:background="#3D4CDC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="71dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="72dp"
+        android:layout_marginBottom="50dp"
+        android:background="#A7AFDE"
+        android:backgroundTint="#7CA4C8"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Media -->
+        <!-- Title, secondary and supporting text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title"
+            android:textAppearance="?attr/textAppearanceHeadline6" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tituloCurso"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#A7AFDE"
-            android:backgroundTint="#7CA4C8"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:fontFamily="sans-serif"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-            <!-- Title, secondary and supporting text -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title"
-                android:textAppearance="?attr/textAppearanceHeadline6" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/secondary_text"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="?android:attr/textColorSecondary" />
 
-            <TextView
-                android:id="@+id/tituloCurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:textAlignment="center"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/supporting_text"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="?android:attr/textColorSecondary" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/secondary_text"
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="?android:attr/textColorSecondary" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="190dp"
+            android:contentDescription="@string/content_description_media"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/pesas" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/supporting_text"
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="?android:attr/textColorSecondary" />
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="194dp"
-                android:contentDescription="@string/content_description_media"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/pesas" />
-
-        </LinearLayout>
-
-        <!-- Buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/verDetalle"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="77dp"
-                android:text="Ver Detalle"
-                android:textColor="#E6DCDC"
-                android:textColorHint="#FAEBEB"
-                android:textColorLink="#F6F4F4"
-                android:textStyle="bold"
-                android:visibility="visible"
-                app:backgroundTint="#7786DB"
-                tools:visibility="visible" />
-        </LinearLayout>
+        <Button
+            android:id="@+id/verDetalle"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTintMode="add"
+            android:foregroundTint="#122CBD"
+            android:text="Ver Detalle"
+            android:textAlignment="center"
+            android:textColor="#141414"
+            android:textColorHint="#FAEBEB"
+            android:textColorLink="#F6F4F4"
+            android:textStyle="bold"
+            android:visibility="visible"
+            app:backgroundTint="#0B24AD"
+            tools:visibility="visible" />
 
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

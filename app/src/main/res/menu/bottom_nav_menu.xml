@@ -1,27 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/fragmentcatalogo"
+        android:color="@color/design_default_color_on_primary"
         android:enabled="true"
-        android:title="@string/home"
-        android:color ="@color/design_default_color_on_primary"
-        />
+        android:title="@string/home" />
     <item
         android:id="@+id/fragment_usuario_perfil"
+        android:color="@color/design_default_color_on_primary"
         android:enabled="true"
-        android:title="@string/perfil"
-        android:color ="@color/design_default_color_on_primary"
-        />
+        android:title="@string/perfil" />
     <item
         android:id="@+id/fragment_historial"
         android:enabled="true"
-        android:title="@string/historial"
-        />
+        android:title="@string/historial" />
 
-    <item
-        android:id="@+id/page_4"
-        android:enabled="true"
-        android:title="@string/salir" />
 
 </menu>
