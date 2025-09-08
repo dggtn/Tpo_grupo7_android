@@ -4,6 +4,11 @@ public class Clase {
     String nombre;
     String profesor;
 
+    public Clase(String nombre) {
+        this.nombre = nombre;
+        this.profesor = "";
+    }
+
     public Clase(String nombre, String profesor) {
         this.nombre = nombre;
         this.profesor = profesor;

@@ -1,7 +1,7 @@
 package com.example.tpo_mobile.di;
 
 import com.example.tpo_mobile.Repository.ClasesRepository;
-import com.example.tpo_mobile.Repository.ClasesRepositoryMemory;
+import com.example.tpo_mobile.Repository.GymRetrofitRepository;
 
 import javax.inject.Singleton;
 
@@ -16,5 +16,5 @@ public abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    public abstract ClasesRepository provideClasesRepository(ClasesRepositoryMemory impl);
+    public abstract ClasesRepository provideClasesRepository(GymRetrofitRepository impl);
 }
