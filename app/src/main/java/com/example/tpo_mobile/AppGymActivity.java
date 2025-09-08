@@ -1,5 +1,6 @@
 package com.example.tpo_mobile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -21,6 +22,9 @@ public class AppGymActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Intent intent2 = new Intent(android.provider.Settings.ACTION_SETTINGS);
+        startActivity(intent2);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gym_app);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
