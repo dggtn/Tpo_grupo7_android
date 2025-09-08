@@ -4,15 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="#A98D8D"
     android:backgroundTint="#977D7D"
     android:foregroundTint="#2196F3">
 
 
     <LinearLayout
-        android:layout_width="218dp"
-        android:layout_height="374dp"
+        android:layout_width="198dp"
+        android:layout_height="375dp"
         android:background="#3D4CDC"
         android:orientation="vertical"
         android:visibility="visible"
@@ -75,16 +75,15 @@
 
         <!-- Buttons -->
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/verDetalle"
                 style="?attr/borderlessButtonStyle"
-                android:layout_width="188dp"
-                android:layout_height="200dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:text="Ver Detalle"
                 android:textColor="#E6DCDC"
                 android:textColorHint="#FAEBEB"

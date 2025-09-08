@@ -45,7 +45,7 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_usuario_perfil"
-        android:name="com.example.tpo_mobile.CatalogoFragment"
+        android:name="com.example.tpo_mobile.PerfilFragment"
         android:label="Mi perfil"
         tools:layout="@layout/fragment_catalogo">
     </fragment>
