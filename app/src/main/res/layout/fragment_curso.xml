@@ -11,8 +11,8 @@
 
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="218dp"
+        android:layout_height="374dp"
         android:background="#3D4CDC"
         android:orientation="vertical"
         android:visibility="visible"
@@ -81,18 +81,9 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button_inscribirse"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#4B52AF"
-                android:foregroundTint="#A92828"
-                android:text="Inscribirse" />
-
-            <Button
                 android:id="@+id/verDetalle"
                 style="?attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="188dp"
                 android:layout_height="match_parent"
                 android:text="Ver Detalle"
                 android:textColor="#E6DCDC"

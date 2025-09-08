@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Tpo_mobile" parent="Theme.MaterialComponents.Light.NoActionBar"
-        />
+    <style name="Theme.Tpo_mobile" parent="Theme.MaterialComponents.Light.NoActionBar">
+
+    </style>
 </resources>

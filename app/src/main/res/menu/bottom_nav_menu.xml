@@ -2,16 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     >
     <item
-        android:id="@+id/page_1"
+        android:id="@+id/fragmentcatalogo"
         android:enabled="true"
         android:title="Home"
         />
     <item
-        android:id="@+id/page_2"
+        android:id="@+id/fragment_usuario_perfil"
         android:enabled="true"
         android:title="Perfil"/>
     <item
-        android:id="@+id/page_3"
+        android:id="@+id/fragment_historial"
         android:enabled="true"
         android:title="Historial"/>
     <item
