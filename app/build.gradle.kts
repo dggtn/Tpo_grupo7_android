@@ -1,14 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
-    id("com.google.dagger.hilt.android") version "2.57.1"
+    id("com.google.dagger.hilt.android")
 }
 
 android {
-    namespace = "com.uade.tpo_mobile"
+    namespace = "com.example.tpo_mobile"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.uade.tpo_mobile"
+        applicationId = "com.example.tpo_mobile"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -27,22 +27,17 @@ android {
         }
     }
     compileOptions {
+
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-        isCoreLibraryDesugaringEnabled = true
     }
-
-    lint {
-        abortOnError = false
-    }
-    hilt {
-        namespace = "com.example.tpo_mobile"
-    }
+    buildToolsVersion = "30.0.3"
 }
 
 dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.core)
+    implementation(libs.androidx.recyclerview)
     val fragment_version = "1.8.9"
     implementation(libs.material)
 
@@ -71,6 +66,10 @@ dependencies {
     implementation("androidx.biometric:biometric:1.1.0")
 //material design
     implementation("com.google.android.material:material:1.5.0")
+
+    //recycler viewer
+
+    implementation("androidx.recyclerview:recyclerview:1.3.2") // Use the latest stable version
 
 
 }
