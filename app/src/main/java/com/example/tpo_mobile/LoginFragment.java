@@ -1,5 +1,6 @@
 package com.example.tpo_mobile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,7 +11,6 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
 public class LoginFragment extends Fragment {
 
@@ -34,8 +34,13 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Button button = view.findViewById(R.id.buttonIniciaSesion);
         button.setOnClickListener((view1)->{
-            Navigation.findNavController(view1).navigate(R.id.entrarHome, new Bundle());
+            Intent intent = new Intent(getActivity(),AppGymActivity.class);
+            startActivity(intent);
+
+
         });
+
+
     }
 
     @Override
