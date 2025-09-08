@@ -59,6 +59,8 @@
         app:layout_constraintTop_toTopOf="@+id/appBarLayout"
         app:layout_constraintVertical_bias="1.0"
         app:menu="@menu/bottom_nav_menu"
-        tools:layout_editor_absoluteX="-16dp" />
+        tools:layout_editor_absoluteX="-16dp"
+        app:itemTextColor="@color/design_default_color_primary_dark"
+        app:labelVisibilityMode="labeled"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

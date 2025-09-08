@@ -24,4 +24,8 @@
     <string name="action_1" />
     <string name="action_2" />
     <string name="page_title">Gimnasio</string>
+    <string name="home">Home</string>
+    <string name="perfil">Perfil</string>
+    <string name="historial">Historial</string>
+    <string name="salir">Salir</string>
 </resources>

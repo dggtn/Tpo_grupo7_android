@@ -4,18 +4,24 @@
     <item
         android:id="@+id/fragmentcatalogo"
         android:enabled="true"
-        android:title="Home"
+        android:title="@string/home"
+        android:color ="@color/design_default_color_on_primary"
         />
     <item
         android:id="@+id/fragment_usuario_perfil"
         android:enabled="true"
-        android:title="Perfil"/>
+        android:title="@string/perfil"
+        android:color ="@color/design_default_color_on_primary"
+        />
     <item
         android:id="@+id/fragment_historial"
         android:enabled="true"
-        android:title="Historial"/>
+        android:title="@string/historial"
+        />
+
     <item
         android:id="@+id/page_4"
         android:enabled="true"
-        android:title="Salir"/>
+        android:title="@string/salir" />
+
 </menu>
