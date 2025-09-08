@@ -29,6 +29,9 @@
         android:name="com.example.tpo_mobile.DetalleCursoFragment"
         android:label="detalle curso"
         tools:layout="@layout/fragment_detalle_curso">
+        <argument
+            android:name="nombreCurso"
+            app:argType="string"/>
         <action
             android:id="@+id/alert_reservaste"
             app:destination="@+id/fragment_dialog_reservaste"/>

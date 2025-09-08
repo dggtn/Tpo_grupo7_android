@@ -8,13 +8,12 @@
     android:background="#9D8888">
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/TituloNombreCurso"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="110dp"
         android:layout_marginEnd="169dp"
         android:layout_marginBottom="58dp"
-        android:text="Pesas"
         android:textAlignment="viewStart"
         android:textSize="48sp"
         android:textStyle="bold"

@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_activity);
 
     }
+
+
     @Override
     protected void onStart() {
         super.onStart();
