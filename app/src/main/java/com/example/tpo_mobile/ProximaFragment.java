@@ -16,10 +16,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tpo_mobile.Repository.ClasesServiceCallBack;
+import com.example.tpo_mobile.Repository.GetAllClasesCallback;
 import com.example.tpo_mobile.adapters.CatalogoAdapter;
 import com.example.tpo_mobile.model.Clase;
-import com.example.tpo_mobile.services.ClaseService;
+import com.example.tpo_mobile.services.GymService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class ProximaFragment extends Fragment {
 
     @Inject
-    ClaseService clasesService;
+    GymService clasesService;
     private ListView listView;
     private List<String> claseDisplayList;
     private ArrayAdapter<String> adapter;
@@ -56,7 +56,7 @@ public class ProximaFragment extends Fragment {
     }
 
     private void loadclases() {
-        clasesService.getAllClases(new ClasesServiceCallBack() {
+        clasesService.getAllClases(new GetAllClasesCallback() {
             @Override
             public void onSuccess(List<Clase> clases) {
                 clasesMostradas.clear();

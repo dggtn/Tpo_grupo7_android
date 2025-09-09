@@ -1,7 +1,7 @@
 package com.example.tpo_mobile.di;
 
-import com.example.tpo_mobile.services.ClaseService;
-import com.example.tpo_mobile.services.ClaseServiceImpl;
+import com.example.tpo_mobile.services.GymService;
+import com.example.tpo_mobile.services.GymServiceImpl;
 
 import javax.inject.Singleton;
 
@@ -16,6 +16,6 @@ public abstract class ServiceModule {
 
     @Binds
     @Singleton
-    public abstract ClaseService provideClaseService(ClaseServiceImpl impl);
+    public abstract GymService provideClaseService(GymServiceImpl impl);
 
 }

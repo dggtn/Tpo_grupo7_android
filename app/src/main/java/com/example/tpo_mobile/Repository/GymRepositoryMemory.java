@@ -1,6 +1,7 @@
 package com.example.tpo_mobile.Repository;
 
 import com.example.tpo_mobile.model.Clase;
+import com.example.tpo_mobile.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +10,16 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class ClasesRepositoryMemory implements ClasesRepository {
+public class GymRepositoryMemory {
     private final List<Clase> clases;
+    private final List<User> users;
 
     @Inject
-    public ClasesRepositoryMemory() {
+    public GymRepositoryMemory() {
         this.clases = new ArrayList<>();
         initializeClases();
+        this.users = new ArrayList<>();
+        initializeUsers();
     }
 
     private void initializeClases() {
@@ -28,13 +32,14 @@ public class ClasesRepositoryMemory implements ClasesRepository {
 
 
 
-    @Override
-    public void getAllClases(ClasesServiceCallBack callback) {
-        callback.onSuccess(clases);
+    private void  initializeUsers() {
+        users.add(new User("dggtn@gmail.com","Daniela"));
+        users.add(new User("juan@gmail.com","Juan"));
+        users.add(new User("maria@gmail.com","Maria"));
+        users.add(new User("luciana@gmail.com","Luciana"));
+
     }
 
-    @Override
-    public void getClasesByName(String name, ClasesServiceCallBack callback) {
-        callback.onSuccess(clases);
-    }
+
+
 }

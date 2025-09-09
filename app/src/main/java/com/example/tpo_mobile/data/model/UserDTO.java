@@ -1,14 +1,8 @@
-package com.example.tpo_mobile.model;
+package com.example.tpo_mobile.data.model;
 
-public class User {
+public class UserDTO {
     private String email;
     private String name;
-
-    public User(String email, String name) {
-        this.email = email;
-        this.name = name;
-    }
-
 
 
     public String getEmail() {
@@ -26,4 +20,5 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
+
 }
