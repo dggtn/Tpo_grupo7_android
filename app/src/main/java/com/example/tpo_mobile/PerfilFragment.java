@@ -26,6 +26,9 @@ public class PerfilFragment extends Fragment {
     GymService gymService;
 
     private TextView emailUsuario;
+    private TextView nameUsuario;
+
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,8 +48,8 @@ public class PerfilFragment extends Fragment {
         gymService.getUser(new GetUserCallback() {
             @Override
             public void onSuccess(User user) {
-                Log.d("getuser", user.getEmail());
                 emailUsuario.setText(user.getEmail());
+                nameUsuario.setText(user.getName());
             }
 
             @Override
@@ -60,27 +63,8 @@ public class PerfilFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.emailUsuario = view.findViewById(R.id.email_text_view);
+        this.nameUsuario = view.findViewById(R.id.name_text_view);
         loadUsuario();
-
-
-//        Button button = view.findViewById(R.id.verDetalle);
-//        button.setOnClickListener((view1) -> {
-//            Navigation.findNavController(view1).navigate(R.id.curso, new Bundle());
-//            ;
-//            listView = view.findViewById(R.id.listView);
-//            claseDisplayList = new ArrayList<>();
-//            adapter = new ArrayAdapter<>(requireContext(),
-//                    android.R.layout.simple_list_item_1,
-//                    claseDisplayList);
-//            listView.setAdapter(adapter);
-//            loadclases();
-//
-//            listView.setOnItemClickListener((parent, v, position, id) -> {
-//                String selectedClase = claseDisplayList.get(position);
-//                String claseName = selectedClase.split(" - ")[0];
-//
-//            });
-//        });
 
 
     }
