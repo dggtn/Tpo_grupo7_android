@@ -22,8 +22,8 @@
 
     <TextView
         android:id="@+id/name_text_view"
-        android:layout_width="123dp"
-        android:layout_height="66dp"
+        android:layout_width="315dp"
+        android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -39,8 +39,8 @@
 
     <TextView
         android:id="@+id/email_text_view"
-        android:layout_width="123dp"
-        android:layout_height="66dp"
+        android:layout_width="326dp"
+        android:layout_height="42dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -63,10 +63,10 @@
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.168"
+        app:layout_constraintHorizontal_bias="0.139"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintVertical_bias="0.065"
         app:srcCompat="@drawable/pesas" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
