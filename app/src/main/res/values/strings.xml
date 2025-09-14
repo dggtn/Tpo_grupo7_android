@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">tpo_mobile</string>
+    <string name="app_name">RITMOFIT</string>
     <string name="home_title">WorkNow</string>
     <string name="home_subtitle">Bienvenido!</string>
     <string name="home_thirdtitle">Reservá. Entrená. Repetí</string>
@@ -15,7 +15,7 @@
     <string name="inicia_sesion">Inicia Sesión</string>
     <string name="registrate">Registrate</string>
     <string name="ingresa_tu_email">Ingresa tu email:</string>
-    <string name="enviar_c_digo">Enviar Código</string>
+    <string name="enviar_codigo">Enviar Código</string>
     <string name="recuperar_acceso">Recuperar acceso</string>
     <string name="content_description_media" />
     <string name="title" />
@@ -29,4 +29,17 @@
     <string name="historial">Historial</string>
     <string name="salir">Salir</string>
     <string name="proximas">proximas</string>
+    <string name="todo_">TODO</string>
+    <string name="registro_de_usuario">Registro de Usuario</string>
+    <string name="iniciar_sesion">Inicio de Sesión</string>
+    <string name="edad_opcional">Edad (opcional)</string>
+    <string name="direccion_opcional">Dirección (opcional)</string>
+    <string name="confirmar_email">Verificación de Email</string>
+    <string name="codigo_enviado_a">Código enviado a:</string>
+    <string name="Enter_4digit_code">Ingresa el código de verificación de 4 dígitos que recibiste por email:</string>
+    <string name="_0000">0000</string>
+    <string name="verificar_codigo">Verificar</string>
+    <string name="reenviar_codigo">Reenviar Código</string>
+    <string name="code_expire">Nota: El código expira en 15 minutos</string>
+
 </resources>

@@ -2,49 +2,13 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/loginFragment">
+    android:id="@+id/gym_nav_graph"
+    app:startDestination="@id/fragmentcatalogo">
 
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.tpo_mobile.fragments.LoginFragment"
-        android:label="Login"
-        tools:layout="@layout/fragment_login">
-        <action
-            android:id="@+id/action_login_to_register"
-            app:destination="@+id/registerFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.example.tpo_mobile.fragments.RegisterFragment"
-        android:label="Registro"
-        tools:layout="@layout/fragment_register">
-        <action
-            android:id="@+id/action_register_to_verification"
-            app:destination="@+id/verificationFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/verificationFragment"
-        android:name="com.example.tpo_mobile.fragments.VerificationFragment"
-        android:label="Verificación"
-        tools:layout="@layout/fragment_verification">
-        <argument
-            android:name="email"
-            app:argType="string" />
-        <action
-            android:id="@+id/action_verification_to_login"
-            app:destination="@+id/loginFragment"
-            app:popUpTo="@+id/loginFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
-
-    <!-- Navegación existente del gym -->
     <fragment
         android:id="@+id/fragmentcatalogo"
         android:name="com.example.tpo_mobile.fragments.CatalogoFragment"
-        android:label="fragmentcatalogo"
+        android:label="Catálogo"
         tools:layout="@layout/fragment_catalogo">
         <action
             android:id="@+id/curso"
@@ -54,7 +18,7 @@
     <fragment
         android:id="@+id/fragment_detalle_curso"
         android:name="com.example.tpo_mobile.fragments.DetalleCursoFragment"
-        android:label="detalle curso"
+        android:label="Detalle del Curso"
         tools:layout="@layout/fragment_detalle_curso">
         <argument
             android:name="nombreCurso"
@@ -67,14 +31,14 @@
     <fragment
         android:id="@+id/fragment_dialog_reservaste"
         android:name="com.example.tpo_mobile.fragments.DialogFragment"
-        android:label="fragmentReserva"
+        android:label="Confirmación de Reserva"
         tools:layout="@layout/fragment_dialog_reservaste">
     </fragment>
 
     <fragment
         android:id="@+id/fragment_usuario_perfil"
         android:name="com.example.tpo_mobile.fragments.ProfileFragment"
-        android:label="Mi perfil"
+        android:label="Mi Perfil"
         tools:layout="@layout/fragment_profile">
     </fragment>
 
@@ -88,7 +52,7 @@
     <fragment
         android:id="@+id/fragment_proximos_clases"
         android:name="com.example.tpo_mobile.fragments.ProximaFragment"
-        android:label="Próximas"
+        android:label="Próximas Clases"
         tools:layout="@layout/fragment_proximos_clases">
     </fragment>
 

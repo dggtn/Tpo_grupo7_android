@@ -1,4 +1,4 @@
-package com.example.tpo_mobile.data.model;
+package com.example.tpo_mobile.data.modelDTO;
 
 public class ClaseDTO {
 

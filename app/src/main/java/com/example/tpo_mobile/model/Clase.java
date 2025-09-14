@@ -1,8 +1,8 @@
 package com.example.tpo_mobile.model;
 
 public class Clase {
-    String nombre;
-    String profesor;
+    private String nombre;
+    private String profesor;
 
     public Clase(String nombre) {
         this.nombre = nombre;

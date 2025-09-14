@@ -10,7 +10,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/login_fragment"
-        android:name="com.example.tpo_mobile.LoginFragment"
+        android:name="com.example.tpo_mobile.fragments.LoginFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:defaultNavHost="true"

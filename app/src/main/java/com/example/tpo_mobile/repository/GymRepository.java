@@ -1,7 +1,7 @@
-package com.example.tpo_mobile.Repository;
+package com.example.tpo_mobile.repository;
 
 public interface GymRepository {
-    void getAllClases(GetAllClasesCallback callback);
+
     void getClasesByName(String name, GetAllClasesCallback callback);
 
     void getUser(GetUserCallback callback);

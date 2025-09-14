@@ -1,8 +1,12 @@
 package com.example.tpo_mobile.services;
 
-import com.example.tpo_mobile.Repository.GetAllClasesCallback;
-import com.example.tpo_mobile.Repository.GetUserCallback;
-import com.example.tpo_mobile.Repository.GymRepository;
+import static android.content.ContentValues.TAG;
+
+import android.util.Log;
+
+import com.example.tpo_mobile.repository.GetAllClasesCallback;
+import com.example.tpo_mobile.repository.GetUserCallback;
+import com.example.tpo_mobile.repository.GymRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -19,11 +23,13 @@ public class GymServiceImpl implements GymService {
 
     @Override
     public void getAllClases(GetAllClasesCallback callback) {
-        this.gymRepository.getAllClases(callback);
+
     }
 
     @Override
     public void getUser(GetUserCallback callback) {
+        Log.d(TAG, "Solicitando datos del usuario");
+
         this.gymRepository.getUser(callback);
     }
 

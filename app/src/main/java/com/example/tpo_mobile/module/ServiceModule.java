@@ -1,4 +1,4 @@
-package com.example.tpo_mobile.di;
+package com.example.tpo_mobile.module;
 
 import com.example.tpo_mobile.services.GymService;
 import com.example.tpo_mobile.services.GymServiceImpl;

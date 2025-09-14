@@ -1,39 +1,82 @@
-package com.example.tpo_mobile;
+package com.example.tpo_mobile.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.tpo_mobile.R;
+import com.example.tpo_mobile.utils.TokenManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class AppGymActivity extends AppCompatActivity {
 
+    private static final String TAG = "AppGymActivity";
 
-    private static final String TAG = "ActivityLifecycle";
-
+    @Inject
+    TokenManager tokenManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        Intent intent2 = new Intent(android.provider.Settings.ACTION_SETTINGS);
-        startActivity(intent2);
         super.onCreate(savedInstanceState);
+
+        // Verificar si está autenticado
+        if (!tokenManager.isLoggedIn()) {
+            navigateToLogin();
+            return;
+        }
+
         setContentView(R.layout.gym_app);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        assert navHostFragment != null;
-        NavController navController = navHostFragment.getNavController();
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+        setupNavigation();
     }
 
+    private void setupNavigation() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment);
+
+        if (navHostFragment != null) {
+            NavController navController = navHostFragment.getNavController();
+            NavigationUI.setupWithNavController(bottomNavigationView, navController);
+        }
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.top_app_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getTitle() != null && item.getTitle().equals("Salir")) {
+            logout();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logout() {
+        tokenManager.clearToken();
+        navigateToLogin();
+    }
 
     @Override
     protected void onStart() {
@@ -70,8 +113,6 @@ public class AppGymActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG, "⭐ onDestroy: La Activity está siendo destruida");
     }
-
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

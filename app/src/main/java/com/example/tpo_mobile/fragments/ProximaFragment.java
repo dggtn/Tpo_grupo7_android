@@ -1,4 +1,4 @@
-package com.example.tpo_mobile;
+package com.example.tpo_mobile.fragments;
 
 
 import android.os.Bundle;
@@ -16,7 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tpo_mobile.Repository.GetAllClasesCallback;
+import com.example.tpo_mobile.R;
+import com.example.tpo_mobile.repository.GetAllClasesCallback;
 import com.example.tpo_mobile.adapters.CatalogoAdapter;
 import com.example.tpo_mobile.model.Clase;
 import com.example.tpo_mobile.services.GymService;

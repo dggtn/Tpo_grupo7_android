@@ -1,9 +1,11 @@
-package com.example.tpo_mobile;
+package com.example.tpo_mobile.activities;
 
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.tpo_mobile.R;
 
 import dagger.hilt.android.AndroidEntryPoint;
 

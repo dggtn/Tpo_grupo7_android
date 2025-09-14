@@ -1,4 +1,4 @@
-package com.example.tpo_mobile.Repository;
+package com.example.tpo_mobile.repository;
 
 import com.example.tpo_mobile.model.Clase;
 

@@ -1,8 +1,10 @@
-package com.example.tpo_mobile.di;
+package com.example.tpo_mobile.module;
 
 import android.content.Context;
 
+import com.example.tpo_mobile.data.api.AuthApiService;
 import com.example.tpo_mobile.data.api.GymApiService;
+import com.example.tpo_mobile.network.AuthInterceptor;
 
 import java.io.File;
 
@@ -19,6 +21,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+
 @Module
 @InstallIn(SingletonComponent.class)
 public class NetworkModule {
@@ -33,12 +36,13 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    OkHttpClient provideOkHttpClient(Cache cache) {
+    OkHttpClient provideOkHttpClient(Cache cache, AuthInterceptor authInterceptor) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         return new OkHttpClient.Builder()
                 .addInterceptor(logging)
+                .addInterceptor(authInterceptor)
                 .cache(cache)
                 .addNetworkInterceptor(chain -> {
                     return chain.proceed(chain.request())
@@ -53,10 +57,16 @@ public class NetworkModule {
     @Singleton
     Retrofit provideRetrofit(OkHttpClient client) {
         return new Retrofit.Builder()
-                .baseUrl("https://6f184276-4286-4ec3-af1a-c0cb45e736e7.mock.pstmn.io")
+                .baseUrl("http://10.0.2.2:8080/") // Para emulador Android - cambiar por tu IP del backend
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+    }
+
+    @Provides
+    @Singleton
+    AuthApiService provideAuthApiService(Retrofit retrofit) {
+        return retrofit.create(AuthApiService.class);
     }
 
     @Provides

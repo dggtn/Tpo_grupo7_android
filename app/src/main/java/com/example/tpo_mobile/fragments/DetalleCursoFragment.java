@@ -1,4 +1,4 @@
-package com.example.tpo_mobile;
+package com.example.tpo_mobile.fragments;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+
+import com.example.tpo_mobile.R;
 
 public class DetalleCursoFragment extends Fragment {
     private String nombreCurso;
