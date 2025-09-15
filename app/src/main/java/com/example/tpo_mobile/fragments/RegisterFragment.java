@@ -69,21 +69,34 @@ public class RegisterFragment extends Fragment {
     }
 
     private void setupListeners() {
-        sendCodeButton.setOnClickListener(v -> performRegistration());
-        backToLoginButton.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
+        sendCodeButton.setOnClickListener(v -> {
+            Log.d(TAG, "Botón Enviar Código presionado");
+            performRegistration();
+        });
+        backToLoginButton.setOnClickListener(v -> {
+            Log.d(TAG, "Botón back presionado");
+            Navigation.findNavController(v).popBackStack();
+        });
     }
 
     private void performRegistration() {
+        Log.d(TAG, "performRegistration() iniciado");
+
         if (!validateInput()) {
+            Log.d(TAG, "Validación falló");
             return;
         }
 
+        Log.d(TAG, "Validación exitosa, enviando request");
         showLoading(true);
 
         RegisterRequest request = createRegisterRequest();
+        Log.d(TAG, "Request creado para email: " + request.getEmail());
+
         authRepository.iniciarRegistro(request, new AuthRepository.AuthCallback<String>() {
             @Override
             public void onSuccess(String result) {
+                Log.d(TAG, "Success response: " + result);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         showLoading(false);
@@ -91,15 +104,25 @@ public class RegisterFragment extends Fragment {
 
                         // Navegar a fragment de verificación con el email
                         Bundle args = new Bundle();
-                        args.putString("email", emailEditText.getText().toString().trim());
-                        Navigation.findNavController(requireView())
-                                .navigate(R.id.action_register_to_verification, args);
+                        String email = emailEditText.getText().toString().trim();
+                        args.putString("email", email);
+                        Log.d(TAG, "Navegando a verification con email: " + email);
+
+                        try {
+                            Navigation.findNavController(requireView())
+                                    .navigate(R.id.action_register_to_verification, args);
+                            Log.d(TAG, "Navegación exitosa");
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error en navegación: " + e.getMessage(), e);
+                            Toast.makeText(requireContext(), "Error de navegación", Toast.LENGTH_SHORT).show();
+                        }
                     });
                 }
             }
 
             @Override
             public void onError(String error) {
+                Log.e(TAG, "Error response: " + error);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         showLoading(false);
