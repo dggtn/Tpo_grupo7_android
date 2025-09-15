@@ -30,11 +30,16 @@ public class AuthRepository {
     }
 
     public void iniciarRegistro(RegisterRequest request, AuthCallback<String> callback) {
-        authApiService.iniciarRegistro(request).enqueue(new Callback<String>() {
+        authApiService.iniciarRegistro(request).enqueue(new Callback<ApiResponse<String>>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    callback.onSuccess(response.body());
+                    ApiResponse<String> apiResponse = response.body();
+                    if (apiResponse.isSuccess() && apiResponse.getData() != null) {
+                        callback.onSuccess(apiResponse.getData());
+                    } else {
+                        callback.onError(apiResponse.getError() != null ? apiResponse.getError() : "Error desconocido");
+                    }
                 } else {
                     String error = "Error en el registro";
                     if (response.errorBody() != null) {
@@ -49,18 +54,23 @@ public class AuthRepository {
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
                 callback.onError("Error de conexión: " + t.getMessage());
             }
         });
     }
 
     public void finalizarRegistro(VerificationRequest request, AuthCallback<String> callback) {
-        authApiService.finalizarRegistro(request).enqueue(new Callback<String>() {
+        authApiService.finalizarRegistro(request).enqueue(new Callback<ApiResponse<String>>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    callback.onSuccess(response.body());
+                    ApiResponse<String> apiResponse = response.body();
+                    if (apiResponse.isSuccess() && apiResponse.getData() != null) {
+                        callback.onSuccess(apiResponse.getData());
+                    } else {
+                        callback.onError(apiResponse.getError() != null ? apiResponse.getError() : "Error desconocido");
+                    }
                 } else {
                     String error = "Error en la verificación";
                     if (response.errorBody() != null) {
@@ -75,7 +85,7 @@ public class AuthRepository {
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
                 callback.onError("Error de conexión: " + t.getMessage());
             }
         });

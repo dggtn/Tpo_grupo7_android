@@ -13,10 +13,10 @@ import retrofit2.http.POST;
 public interface AuthApiService {
 
     @POST("auth/iniciar-registro")
-    Call<String> iniciarRegistro(@Body RegisterRequest request);
+    Call<ApiResponse<String>> iniciarRegistro(@Body RegisterRequest request);
 
     @POST("auth/finalizar-registro")
-    Call<String> finalizarRegistro(@Body VerificationRequest request);
+    Call<ApiResponse<String>> finalizarRegistro(@Body VerificationRequest request);
 
     @POST("auth/authenticate")
     Call<ApiResponse<AuthResponse>> authenticate(@Body AuthRequest request);
