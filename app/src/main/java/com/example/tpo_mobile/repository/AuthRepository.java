@@ -6,6 +6,7 @@ import com.example.tpo_mobile.data.modelDTO.AuthResponse;
 import com.example.tpo_mobile.data.modelDTO.RegisterRequest;
 import com.example.tpo_mobile.data.modelDTO.VerificationRequest;
 import com.example.tpo_mobile.data.modelDTO.ApiResponse;
+import com.example.tpo_mobile.utils.TokenManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,10 +24,12 @@ public class AuthRepository {
     }
 
     private final AuthApiService authApiService;
+    private final TokenManager tokenManager;
 
     @Inject
-    public AuthRepository(AuthApiService authApiService) {
+    public AuthRepository(AuthApiService authApiService, TokenManager tokenManager) {
         this.authApiService = authApiService;
+        this.tokenManager = tokenManager;
     }
 
     public void iniciarRegistro(RegisterRequest request, AuthCallback<String> callback) {
@@ -120,5 +123,44 @@ public class AuthRepository {
                 callback.onError("Error de conexión: " + t.getMessage());
             }
         });
+    }
+
+    public void logout(AuthCallback<String> callback) {
+        if (!tokenManager.isLoggedIn()) {
+            callback.onError("No hay sesión activa");
+            return;
+        }
+
+        authApiService.logout().enqueue(new Callback<ApiResponse<String>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
+                // Independientemente de la respuesta del servidor, limpiar datos locales
+                tokenManager.clearToken();
+
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<String> apiResponse = response.body();
+                    if (apiResponse.isSuccess()) {
+                        callback.onSuccess(apiResponse.getData() != null ?
+                                apiResponse.getData() : "Sesión cerrada exitosamente");
+                    } else {
+                        callback.onSuccess("Sesión cerrada localmente"); // Aún así es exitoso localmente
+                    }
+                } else {
+                    callback.onSuccess("Sesión cerrada localmente"); // Aún así es exitoso localmente
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
+                // Aunque falle la comunicación con el servidor, limpiar datos locales
+                tokenManager.clearToken();
+                callback.onSuccess("Sesión cerrada localmente");
+            }
+        });
+    }
+
+    // Método para logout sin comunicación con el servidor (más rápido)
+    public void logoutLocal() {
+        tokenManager.clearToken();
     }
 }

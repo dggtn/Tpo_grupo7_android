@@ -15,10 +15,10 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.843"
+        app:layout_constraintHorizontal_bias="0.106"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.072" />
+        app:layout_constraintVertical_bias="0.045" />
 
     <TextView
         android:id="@+id/name_text_view"
@@ -69,5 +69,21 @@
         app:layout_constraintTop_toBottomOf="@+id/textView"
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/pesas" />
+
+    <!-- Botón de logout agregado -->
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="133dp"
+        android:layout_height="49dp"
+        android:layout_marginBottom="652dp"
+        android:backgroundTint="#F44336"
+        android:text="Cerrar Sesión"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.866"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,21 +1,26 @@
 package com.example.tpo_mobile.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.tpo_mobile.R;
+import com.example.tpo_mobile.activities.MainActivity;
 import com.example.tpo_mobile.data.api.GymApiService;
 import com.example.tpo_mobile.data.modelDTO.ApiResponse;
 import com.example.tpo_mobile.data.modelDTO.UserDTO;
+import com.example.tpo_mobile.services.LogoutService;
 import com.example.tpo_mobile.utils.TokenManager;
 
 import javax.inject.Inject;
@@ -36,8 +41,12 @@ public class ProfileFragment extends Fragment {
     @Inject
     TokenManager tokenManager;
 
+    @Inject
+    LogoutService logoutService;
+
     private TextView email;
     private TextView firstName;
+    private Button logoutButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,14 +65,18 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initViews(view);
+        setupListeners();
         loadUsuario();
     }
 
     private void initViews(View view) {
         firstName = view.findViewById(R.id.name_text_view);
         email = view.findViewById(R.id.email_text_view);
-        //Seguir completando...
+        logoutButton = view.findViewById(R.id.logout_button);
+    }
 
+    private void setupListeners() {
+        logoutButton.setOnClickListener(v -> showLogoutConfirmationDialog());
     }
 
     private void loadUsuario() {
@@ -73,6 +86,12 @@ public class ProfileFragment extends Fragment {
         String savedEmail = tokenManager.getUserEmail();
         if (savedEmail != null) {
             email.setText("Email: " + savedEmail);
+        }
+
+        // Mostrar información básica del usuario
+        String userInfo = tokenManager.getUserInfo();
+        if (userInfo != null) {
+            Log.d(TAG, "Info del usuario: " + userInfo);
         }
 
         // Intentar obtener datos completos del usuario desde el backend
@@ -109,7 +128,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updateUserInfo(UserDTO user) {
-
         if (user.getFirstName() != null && user.getLastName() != null) {
             firstName.setText("Nombre: " + user.getFirstName() + " " + user.getLastName());
         } else if (user.getFirstName() != null) {
@@ -119,7 +137,69 @@ public class ProfileFragment extends Fragment {
             email.setText("Email: " + user.getEmail());
         }
 
-        //Seguir completando...
+        // Guardar nombre del usuario para futuras referencias
+        if (user.getFullName() != null) {
+            tokenManager.saveUserName(user.getFullName());
+        }
+    }
 
+    private void showLogoutConfirmationDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Cerrar Sesión")
+                .setMessage("¿Estás seguro que deseas cerrar sesión?")
+                .setPositiveButton("Sí, cerrar sesión", (dialog, which) -> performLogout())
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void performLogout() {
+        Log.d(TAG, "Iniciando logout desde perfil");
+
+        // Deshabilitar botón mientras se procesa
+        logoutButton.setEnabled(false);
+        logoutButton.setText("Cerrando sesión...");
+
+        logoutService.performLogout(new LogoutService.LogoutCallback() {
+            @Override
+            public void onLogoutSuccess(String message) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Log.d(TAG, "Logout exitoso desde perfil: " + message);
+                        Toast.makeText(requireContext(), "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show();
+                        navigateToLogin();
+                    });
+                }
+            }
+
+            @Override
+            public void onLogoutError(String error) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Log.w(TAG, "Error en logout desde perfil: " + error);
+                        Toast.makeText(requireContext(), "Sesión cerrada (error de conexión)", Toast.LENGTH_SHORT).show();
+                        navigateToLogin();
+                    });
+                }
+            }
+        });
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Verificar que el usuario siga logueado
+        if (!tokenManager.isLoggedIn()) {
+            Log.w(TAG, "Usuario no logueado, redirigiendo");
+            navigateToLogin();
+        }
     }
 }

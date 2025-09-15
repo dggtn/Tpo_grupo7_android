@@ -20,4 +20,7 @@ public interface AuthApiService {
 
     @POST("auth/authenticate")
     Call<ApiResponse<AuthResponse>> authenticate(@Body AuthRequest request);
+
+    @POST("auth/logout")
+    Call<ApiResponse<String>> logout();
 }

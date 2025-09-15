@@ -18,4 +18,7 @@ public abstract class ServiceModule {
     @Singleton
     public abstract GymService provideClaseService(GymServiceImpl impl);
 
+    // LogoutService está marcado con @Inject en su constructor,
+    // por lo que Hilt puede crear la instancia automáticamente.
+    // No necesita binding adicional aquí.
 }
