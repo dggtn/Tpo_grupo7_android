@@ -57,7 +57,7 @@ public class NetworkModule {
     @Singleton
     Retrofit provideRetrofit(OkHttpClient client) {
         return new Retrofit.Builder()
-                .baseUrl("http://localhost:8080/") // Para emulador Android - cambiar por tu IP del backend
+                .baseUrl("http://10.0.2.2:8080/") // Para emulador Android - cambiar por tu IP del backend
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
