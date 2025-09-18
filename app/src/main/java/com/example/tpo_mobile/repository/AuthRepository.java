@@ -6,6 +6,8 @@ import com.example.tpo_mobile.data.modelDTO.AuthResponse;
 import com.example.tpo_mobile.data.modelDTO.RegisterRequest;
 import com.example.tpo_mobile.data.modelDTO.VerificationRequest;
 import com.example.tpo_mobile.data.modelDTO.ApiResponse;
+import com.example.tpo_mobile.data.modelDTO.ReenviarCodigoRequest;
+import com.example.tpo_mobile.data.modelDTO.VerificarEmailRequest;
 import com.example.tpo_mobile.utils.TokenManager;
 
 import javax.inject.Inject;
@@ -76,6 +78,64 @@ public class AuthRepository {
                     }
                 } else {
                     String error = "Error en la verificación";
+                    if (response.errorBody() != null) {
+                        try {
+                            error = response.errorBody().string();
+                        } catch (Exception e) {
+                            // Usar error por defecto
+                        }
+                    }
+                    callback.onError(error);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
+                callback.onError("Error de conexión: " + t.getMessage());
+            }
+        });
+    }
+
+    // NUEVO: Verificar si existe un registro pendiente
+    public void verificarEmailPendiente(String email, AuthCallback<String> callback) {
+        VerificarEmailRequest request = new VerificarEmailRequest(email);
+        authApiService.verificarEmailPendiente(request).enqueue(new Callback<ApiResponse<String>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<String> apiResponse = response.body();
+                    if (apiResponse.isSuccess() && apiResponse.getData() != null) {
+                        callback.onSuccess(apiResponse.getData());
+                    } else {
+                        callback.onError(apiResponse.getError() != null ? apiResponse.getError() : "No hay registro pendiente para este email");
+                    }
+                } else {
+                    callback.onError("No hay registro pendiente para este email");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
+                callback.onError("Error de conexión: " + t.getMessage());
+            }
+        });
+    }
+
+    // NUEVO: Reenviar código de verificación
+    public void reenviarCodigo(String email, AuthCallback<String> callback) {
+        ReenviarCodigoRequest request = new ReenviarCodigoRequest(email);
+        authApiService.reenviarCodigo(request).enqueue(new Callback<ApiResponse<String>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<String> apiResponse = response.body();
+                    if (apiResponse.isSuccess() && apiResponse.getData() != null) {
+                        callback.onSuccess(apiResponse.getData());
+                    } else {
+                        callback.onError(apiResponse.getError() != null ? apiResponse.getError() : "Error al reenviar código");
+                    }
+                } else {
+                    String error = "Error al reenviar código";
                     if (response.errorBody() != null) {
                         try {
                             error = response.errorBody().string();

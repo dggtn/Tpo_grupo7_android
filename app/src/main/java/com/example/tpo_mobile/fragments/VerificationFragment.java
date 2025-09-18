@@ -77,7 +77,12 @@ public class VerificationFragment extends Fragment {
 
     private void setupListeners() {
         verifyButton.setOnClickListener(v -> performVerification());
-        resendButton.setOnClickListener(v -> resendCode());
+
+        // ACTUALIZADO: Implementar reenvío de código real
+        resendButton.setOnClickListener(v -> {
+            Log.d(TAG, "Botón reenviar código presionado");
+            resendVerificationCode();
+        });
     }
 
     private void displayEmail() {
@@ -130,14 +135,69 @@ public class VerificationFragment extends Fragment {
         });
     }
 
-    private void resendCode() {
-        Toast.makeText(requireContext(), "Funcionalidad de reenvío no implementada", Toast.LENGTH_SHORT).show();
-        // Aquí podrías implementar la funcionalidad de reenvío si tu backend lo soporta
+    // NUEVO: Implementación real del reenvío de código
+    private void resendVerificationCode() {
+        if (email == null || email.trim().isEmpty()) {
+            Toast.makeText(requireContext(), "Error: Email no disponible", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        showLoading(true);
+
+        authRepository.reenviarCodigo(email, new AuthRepository.AuthCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Log.d(TAG, "Código reenviado exitosamente: " + result);
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        showLoading(false);
+                        Toast.makeText(requireContext(), result, Toast.LENGTH_LONG).show();
+
+                        // Limpiar el campo de código para que el usuario ingrese el nuevo
+                        codeEditText.setText("");
+                        codeEditText.requestFocus();
+                    });
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "Error reenviando código: " + error);
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        showLoading(false);
+                        Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_LONG).show();
+
+                        // Si el registro ha expirado completamente, ofrecer volver al registro
+                        if (error.contains("expirado completamente") || error.contains("iniciar el proceso")) {
+                            showExpiredRegistrationDialog();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    // NUEVO: Diálogo cuando el registro ha expirado completamente
+    private void showExpiredRegistrationDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Registro Expirado")
+                .setMessage("Tu registro ha expirado completamente. ¿Deseas iniciar un nuevo registro?")
+                .setPositiveButton("Sí, registrarme", (dialog, which) -> {
+                    // Navegar al registro con el email pre-llenado si es posible
+                    Navigation.findNavController(requireView()).navigate(R.id.action_verification_to_register);
+                })
+                .setNegativeButton("Volver al Login", (dialog, which) -> {
+                    Navigation.findNavController(requireView()).navigate(R.id.action_verification_to_login);
+                })
+                .setCancelable(false)
+                .show();
     }
 
     private void showLoading(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         verifyButton.setEnabled(!show);
         resendButton.setEnabled(!show);
+        codeEditText.setEnabled(!show);
     }
 }

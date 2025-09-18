@@ -13,6 +13,10 @@
         <action
             android:id="@+id/action_login_to_register"
             app:destination="@+id/registerFragment" />
+        <!-- NUEVA ACCIÓN: Login a Recovery -->
+        <action
+            android:id="@+id/action_login_to_recovery"
+            app:destination="@+id/recoveryFragment" />
     </fragment>
 
     <fragment
@@ -23,6 +27,24 @@
         <action
             android:id="@+id/action_register_to_verification"
             app:destination="@+id/verificationFragment" />
+        <!-- NUEVA ACCIÓN: Register a Recovery -->
+        <action
+            android:id="@+id/action_register_to_recovery"
+            app:destination="@+id/recoveryFragment" />
+    </fragment>
+
+    <!-- NUEVO FRAGMENT: Recovery -->
+    <fragment
+        android:id="@+id/recoveryFragment"
+        android:name="com.example.tpo_mobile.fragments.RecoveryFragment"
+        android:label="Recuperar Acceso"
+        tools:layout="@layout/fragment_recovery">
+        <action
+            android:id="@+id/action_recovery_to_verification"
+            app:destination="@+id/verificationFragment" />
+        <action
+            android:id="@+id/action_recovery_to_register"
+            app:destination="@+id/registerFragment" />
     </fragment>
 
     <fragment
@@ -38,6 +60,12 @@
             app:destination="@+id/loginFragment"
             app:popUpTo="@+id/loginFragment"
             app:popUpToInclusive="true" />
+        <!-- NUEVA ACCIÓN: Verification a Register -->
+        <action
+            android:id="@+id/action_verification_to_register"
+            app:destination="@+id/registerFragment"
+            app:popUpTo="@+id/loginFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <!-- Navegación existente del gym -->

@@ -44,6 +44,7 @@ public class LoginFragment extends Fragment {
     private EditText passwordEditText;
     private Button loginButton;
     private Button registerButton;
+    private Button recoverAccessButton; // NUEVO BOTÓN
     private ProgressBar progressBar;
 
     @Override
@@ -76,12 +77,19 @@ public class LoginFragment extends Fragment {
         passwordEditText = view.findViewById(R.id.editTextPassword);
         loginButton = view.findViewById(R.id.buttonIniciaSesion);
         registerButton = view.findViewById(R.id.button_register);
+        recoverAccessButton = view.findViewById(R.id.button_acceso); // NUEVO
         progressBar = view.findViewById(R.id.progressBar);
     }
 
     private void setupListeners() {
         loginButton.setOnClickListener(v -> performLogin());
         registerButton.setOnClickListener(v -> navigateToRegister());
+
+        // NUEVO: Listener para recuperar acceso
+        recoverAccessButton.setOnClickListener(v -> {
+            Log.d(TAG, "Botón recuperar acceso presionado");
+            navigateToRecovery();
+        });
     }
 
     private void performLogin() {
@@ -148,6 +156,7 @@ public class LoginFragment extends Fragment {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         loginButton.setEnabled(!show);
         registerButton.setEnabled(!show);
+        recoverAccessButton.setEnabled(!show);
     }
 
     private void navigateToHome() {
@@ -160,6 +169,11 @@ public class LoginFragment extends Fragment {
 
     private void navigateToRegister() {
         Navigation.findNavController(requireView()).navigate(R.id.action_login_to_register);
+    }
+
+    // NUEVO: Navegación a recuperar acceso
+    private void navigateToRecovery() {
+        Navigation.findNavController(requireView()).navigate(R.id.action_login_to_recovery);
     }
 
     @Override

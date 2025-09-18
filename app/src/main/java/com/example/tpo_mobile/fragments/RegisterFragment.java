@@ -56,10 +56,12 @@ public class RegisterFragment extends Fragment {
 
         initViews(view);
         setupListeners();
+
+        // Si llegamos desde recovery, pre-llenar el email si está disponible
+        prefillEmailFromArguments();
     }
 
     private void initViews(View view) {
-
         emailEditText = view.findViewById(R.id.editTextTextEmailAddress2);
         passwordEditText = view.findViewById(R.id.editTextPassword);
         confirmPasswordEditText = view.findViewById(R.id.editTextConfirmPassword);
@@ -77,6 +79,18 @@ public class RegisterFragment extends Fragment {
             Log.d(TAG, "Botón back presionado");
             Navigation.findNavController(v).popBackStack();
         });
+    }
+
+    private void prefillEmailFromArguments() {
+        Bundle args = getArguments();
+        if (args != null) {
+            String email = args.getString("email");
+            if (email != null && !email.trim().isEmpty()) {
+                emailEditText.setText(email);
+                // Enfocar en el campo de contraseña para mejor UX
+                passwordEditText.requestFocus();
+            }
+        }
     }
 
     private void performRegistration() {
@@ -126,15 +140,42 @@ public class RegisterFragment extends Fragment {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         showLoading(false);
-                        Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_LONG).show();
+
+                        // MEJORADO: Manejo específico de errores
+                        if (error.contains("ya está registrado")) {
+                            // Email ya registrado - ofrecer opciones
+                            showEmailAlreadyExistsDialog(emailEditText.getText().toString().trim());
+                        } else {
+                            Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_LONG).show();
+                        }
                     });
                 }
             }
         });
     }
 
-    private RegisterRequest createRegisterRequest() {
+    // NUEVO: Diálogo cuando el email ya está registrado
+    private void showEmailAlreadyExistsDialog(String email) {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Email Ya Registrado")
+                .setMessage("El email " + email + " ya está registrado. ¿Qué deseas hacer?")
+                .setPositiveButton("Iniciar Sesión", (dialog, which) -> {
+                    // Navegar al login con el email pre-llenado
+                    Navigation.findNavController(requireView()).popBackStack();
+                })
+                .setNegativeButton("Recuperar Acceso", (dialog, which) -> {
+                    // Navegar a recovery con el email
+                    Bundle args = new Bundle();
+                    args.putString("email", email);
+                    Navigation.findNavController(requireView()).navigate(R.id.action_register_to_recovery, args);
+                })
+                .setNeutralButton("Cancelar", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
 
+    private RegisterRequest createRegisterRequest() {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
@@ -183,5 +224,8 @@ public class RegisterFragment extends Fragment {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         sendCodeButton.setEnabled(!show);
         backToLoginButton.setEnabled(!show);
+        emailEditText.setEnabled(!show);
+        passwordEditText.setEnabled(!show);
+        confirmPasswordEditText.setEnabled(!show);
     }
 }

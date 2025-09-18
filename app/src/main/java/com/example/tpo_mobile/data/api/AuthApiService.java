@@ -5,6 +5,8 @@ import com.example.tpo_mobile.data.modelDTO.AuthResponse;
 import com.example.tpo_mobile.data.modelDTO.RegisterRequest;
 import com.example.tpo_mobile.data.modelDTO.VerificationRequest;
 import com.example.tpo_mobile.data.modelDTO.ApiResponse;
+import com.example.tpo_mobile.data.modelDTO.ReenviarCodigoRequest;
+import com.example.tpo_mobile.data.modelDTO.VerificarEmailRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -23,4 +25,11 @@ public interface AuthApiService {
 
     @POST("auth/logout")
     Call<ApiResponse<String>> logout();
+
+    // NUEVOS ENDPOINTS PARA RECUPERACIÓN DE ACCESO
+    @POST("auth/verificar-email-pendiente")
+    Call<ApiResponse<String>> verificarEmailPendiente(@Body VerificarEmailRequest request);
+
+    @POST("auth/reenviar-codigo")
+    Call<ApiResponse<String>> reenviarCodigo(@Body ReenviarCodigoRequest request);
 }
