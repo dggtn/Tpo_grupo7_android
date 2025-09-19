@@ -141,27 +141,32 @@ public class RegisterFragment extends Fragment {
                     getActivity().runOnUiThread(() -> {
                         showLoading(false);
 
-                        // MEJORADO: Manejo específico de errores
-                        if (error.contains("ya está registrado")) {
-                            // Email ya registrado - ofrecer opciones
+                        // MEJORADO: Manejo específico de diferentes tipos de errores
+                        if (error.contains("ya está registrado") || error.contains("already exists")) {
                             showEmailAlreadyExistsDialog(emailEditText.getText().toString().trim());
+                        } else if (error.contains("registro pendiente") || error.contains("pending registration")) {
+                            // Caso especial: hay un registro pendiente
+                            showPendingRegistrationDialog(emailEditText.getText().toString().trim());
                         } else {
                             Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_LONG).show();
                         }
                     });
                 }
             }
+
         });
     }
 
-    // NUEVO: Diálogo cuando el email ya está registrado
+    // Diálogo cuando el email ya está registrado
     private void showEmailAlreadyExistsDialog(String email) {
         new androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle("Email Ya Registrado")
                 .setMessage("El email " + email + " ya está registrado. ¿Qué deseas hacer?")
                 .setPositiveButton("Iniciar Sesión", (dialog, which) -> {
-                    // Navegar al login con el email pre-llenado
-                    Navigation.findNavController(requireView()).popBackStack();
+                    // Navegar al login y pre-llenar el email
+                    Bundle args = new Bundle();
+                    args.putString("email", email);
+                    Navigation.findNavController(requireView()).navigate(R.id.action_register_to_login, args);
                 })
                 .setNegativeButton("Recuperar Acceso", (dialog, which) -> {
                     // Navegar a recovery con el email
@@ -169,7 +174,27 @@ public class RegisterFragment extends Fragment {
                     args.putString("email", email);
                     Navigation.findNavController(requireView()).navigate(R.id.action_register_to_recovery, args);
                 })
-                .setNeutralButton("Cancelar", (dialog, which) -> {
+                .setNeutralButton("Usar otro email", (dialog, which) -> {
+                    // Limpiar el campo email para que el usuario ingrese otro
+                    emailEditText.setText("");
+                    emailEditText.requestFocus();
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void showPendingRegistrationDialog(String email) {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Registro Pendiente")
+                .setMessage("Ya tienes un registro pendiente para " + email + ". ¿Deseas recuperar el acceso para completar la verificación?")
+                .setPositiveButton("Sí, recuperar acceso", (dialog, which) -> {
+                    Bundle args = new Bundle();
+                    args.putString("email", email);
+                    Navigation.findNavController(requireView()).navigate(R.id.action_register_to_recovery, args);
+                })
+                .setNegativeButton("Usar otro email", (dialog, which) -> {
+                    emailEditText.setText("");
+                    emailEditText.requestFocus();
                     dialog.dismiss();
                 })
                 .show();

@@ -124,7 +124,13 @@ public class RecoveryFragment extends Fragment {
                 .setPositiveButton("Sí, enviar código", (dialog, which) -> {
                     resendVerificationCode(email);
                 })
-                .setNegativeButton("Cancelar", (dialog, which) -> {
+                .setNegativeButton("Iniciar nuevo registro", (dialog, which) -> {
+                    // Navegar al registro con el email pre-llenado
+                    Bundle args = new Bundle();
+                    args.putString("email", email);
+                    Navigation.findNavController(requireView()).navigate(R.id.action_recovery_to_register, args);
+                })
+                .setNeutralButton("Cancelar", (dialog, which) -> {
                     dialog.dismiss();
                 })
                 .show();

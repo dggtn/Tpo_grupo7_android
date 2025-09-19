@@ -70,6 +70,21 @@ public class LoginFragment extends Fragment {
 
         initViews(view);
         setupListeners();
+
+        // Pre-llenar email si viene desde recovery u otro fragment
+        prefillEmailFromArguments();
+    }
+
+    private void prefillEmailFromArguments() {
+        Bundle args = getArguments();
+        if (args != null) {
+            String email = args.getString("email");
+            if (email != null && !email.trim().isEmpty()) {
+                emailEditText.setText(email);
+                // Enfocar en el campo de contraseña para mejor UX
+                passwordEditText.requestFocus();
+            }
+        }
     }
 
     private void initViews(View view) {

@@ -27,13 +27,17 @@
         <action
             android:id="@+id/action_register_to_verification"
             app:destination="@+id/verificationFragment" />
-        <!-- NUEVA ACCIÓN: Register a Recovery -->
+        <action
+            android:id="@+id/action_register_to_login"
+            app:destination="@+id/loginFragment" />
+
+        <!-- Register a Recovery -->
         <action
             android:id="@+id/action_register_to_recovery"
             app:destination="@+id/recoveryFragment" />
     </fragment>
 
-    <!-- NUEVO FRAGMENT: Recovery -->
+    <!-- FRAGMENT: Recovery -->
     <fragment
         android:id="@+id/recoveryFragment"
         android:name="com.example.tpo_mobile.fragments.RecoveryFragment"
@@ -45,6 +49,10 @@
         <action
             android:id="@+id/action_recovery_to_register"
             app:destination="@+id/registerFragment" />
+        <action
+            android:id="@+id/action_recovery_to_login"
+            app:destination="@+id/loginFragment" />
+
     </fragment>
 
     <fragment
@@ -60,7 +68,7 @@
             app:destination="@+id/loginFragment"
             app:popUpTo="@+id/loginFragment"
             app:popUpToInclusive="true" />
-        <!-- NUEVA ACCIÓN: Verification a Register -->
+        <!-- Verification a Register -->
         <action
             android:id="@+id/action_verification_to_register"
             app:destination="@+id/registerFragment"
