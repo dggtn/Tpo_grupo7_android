@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.core)
     implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.datastore.preferences.rxjava3)
     val fragment_version = "1.8.9"
     implementation(libs.material)
 
@@ -67,6 +68,14 @@ dependencies {
 
     // RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
+
+    // Coroutines para DataStore
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     // Testing
     testImplementation(libs.junit)

@@ -35,98 +35,97 @@ public class LogoutService {
     }
 
     /**
-     * Logout completo con comunicación al servidor
+     * Realiza el logout completo: notifica al servidor y limpia datos locales
      */
     public void performLogout(LogoutCallback callback) {
-        if (!tokenManager.isLoggedIn()) {
-            callback.onLogoutError("No hay sesión activa");
-            return;
-        }
-
-        String userInfo = tokenManager.getUserInfo();
-        Log.d(TAG, "Iniciando logout para: " + userInfo);
+        Log.d(TAG, "Iniciando logout completo");
 
         authRepository.logout(new AuthRepository.AuthCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                Log.d(TAG, "Logout exitoso: " + result);
+                Log.d(TAG, "Logout exitoso en servidor: " + result);
                 callback.onLogoutSuccess(result);
             }
 
             @Override
             public void onError(String error) {
-                Log.e(TAG, "Error en logout: " + error);
-                // Aún así realizar logout local
-                performLocalLogout();
+                Log.w(TAG, "Error en logout del servidor: " + error);
+                // Aún así considerar como exitoso porque se limpió localmente
                 callback.onLogoutError(error);
             }
         });
     }
 
     /**
-     * Logout local solamente (más rápido)
-     */
-    public void performLocalLogout() {
-        String userInfo = tokenManager.getUserInfo();
-        Log.d(TAG, "Realizando logout local para: " + userInfo);
-
-        tokenManager.clearToken();
-        Log.d(TAG, "Logout local completado");
-    }
-
-    /**
-     * Logout y navegación automática al login
-     */
-    public void logoutAndNavigateToLogin(LogoutCallback callback) {
-        performLogout(new LogoutCallback() {
-            @Override
-            public void onLogoutSuccess(String message) {
-                navigateToLogin();
-                if (callback != null) {
-                    callback.onLogoutSuccess(message);
-                }
-            }
-
-            @Override
-            public void onLogoutError(String error) {
-                // Aún así navegar al login porque se hizo logout local
-                navigateToLogin();
-                if (callback != null) {
-                    callback.onLogoutError(error);
-                }
-            }
-        });
-    }
-
-    /**
-     * Logout local y navegación automática (más rápido)
+     * Logout rápido: solo limpia datos locales y navega
      */
     public void logoutLocalAndNavigateToLogin() {
-        performLocalLogout();
+        Log.d(TAG, "Realizando logout local y navegación");
+
+        // Limpiar datos locales
+        authRepository.logoutLocal();
+
+        // Navegar al login
         navigateToLogin();
     }
 
     /**
-     * Navegar a la pantalla de login
+     * Solo logout local sin navegación
      */
-    private void navigateToLogin() {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        context.startActivity(intent);
-        Log.d(TAG, "Navegación a login iniciada");
+    public void logoutLocalOnly() {
+        Log.d(TAG, "Realizando solo logout local");
+        authRepository.logoutLocal();
     }
 
     /**
-     * Verificar si el usuario está logueado
+     * Navega a la pantalla de login
+     */
+    public void navigateToLogin() {
+        Log.d(TAG, "Navegando al login");
+
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
+
+    /**
+     * Verifica si el usuario está logueado
      */
     public boolean isUserLoggedIn() {
         return tokenManager.isLoggedIn();
     }
 
     /**
-     * Obtener información del usuario actual
+     * Obtiene información básica del usuario actual
      */
     public String getCurrentUserInfo() {
         return tokenManager.getUserInfo();
+    }
+
+    /**
+     * Verifica si la sesión ha expirado
+     * @param maxSessionHours máximo de horas permitidas para la sesión
+     */
+    public boolean isSessionExpired(int maxSessionHours) {
+        long maxSessionMillis = maxSessionHours * 60 * 60 * 1000L;
+        return tokenManager.isSessionExpired(maxSessionMillis);
+    }
+
+    /**
+     * Logout automático por expiración de sesión
+     */
+    public void handleSessionExpired(LogoutCallback callback) {
+        Log.w(TAG, "Sesión expirada, realizando logout automático");
+
+        // Limpiar datos locales inmediatamente
+        logoutLocalOnly();
+
+        // Notificar
+        if (callback != null) {
+            callback.onLogoutSuccess("Sesión expirada");
+        }
+
+        // Navegar al login
+        navigateToLogin();
     }
 }

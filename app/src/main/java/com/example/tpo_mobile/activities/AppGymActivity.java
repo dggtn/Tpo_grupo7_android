@@ -43,7 +43,11 @@ public class AppGymActivity extends AppCompatActivity {
             return;
         }
 
-        Log.d(TAG, "Usuario logueado: " + tokenManager.getUserInfo());
+        try {
+            Log.d(TAG, "Usuario logueado: " + tokenManager.getUserInfo());
+        } catch (Exception e) {
+            Log.w(TAG, "Error obteniendo info de usuario: " + e.getMessage());
+        }
 
         setContentView(R.layout.gym_app);
         setupNavigation();

@@ -1,65 +1,242 @@
 package com.example.tpo_mobile.utils;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
+
+import androidx.datastore.preferences.core.MutablePreferences;
+import androidx.datastore.preferences.core.Preferences;
+import androidx.datastore.preferences.core.PreferencesKeys;
+import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
+import androidx.datastore.rxjava3.RxDataStore;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.functions.Consumer;
 
 @Singleton
 public class TokenManager {
     private static final String TAG = "TokenManager";
-    private static final String PREFS_NAME = "auth_prefs";
-    private static final String TOKEN_KEY = "access_token";
-    private static final String EMAIL_KEY = "user_email";
-    private static final String LOGIN_TIME_KEY = "login_time";
-    private static final String USER_NAME_KEY = "user_name";
+    private static final String DATASTORE_NAME = "auth_preferences";
 
-    private final SharedPreferences sharedPreferences;
+    // Keys para DataStore
+    private static final Preferences.Key<String> TOKEN_KEY = PreferencesKeys.stringKey("access_token");
+    private static final Preferences.Key<String> EMAIL_KEY = PreferencesKeys.stringKey("user_email");
+    private static final Preferences.Key<Long> LOGIN_TIME_KEY = PreferencesKeys.longKey("login_time");
+    private static final Preferences.Key<String> USER_NAME_KEY = PreferencesKeys.stringKey("user_name");
+
+    private final RxDataStore<Preferences> dataStore;
 
     @Inject
     public TokenManager(@ApplicationContext Context context) {
-        this.sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        this.dataStore = new RxPreferenceDataStoreBuilder(context, DATASTORE_NAME).build();
     }
 
     public void saveToken(String token) {
-        sharedPreferences.edit()
-                .putString(TOKEN_KEY, token)
-                .putLong(LOGIN_TIME_KEY, System.currentTimeMillis())
-                .apply();
-        Log.d(TAG, "Token guardado exitosamente");
+        try {
+            dataStore.updateDataAsync(prefsIn -> {
+                MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
+                mutablePreferences.set(TOKEN_KEY, token);
+                mutablePreferences.set(LOGIN_TIME_KEY, System.currentTimeMillis());
+                return Single.just(mutablePreferences);
+            }).subscribe(
+                    new Consumer<Preferences>() {
+                        @Override
+                        public void accept(Preferences preferences) throws Throwable {
+                            Log.d(TAG, "Token guardado exitosamente");
+                        }
+                    },
+                    new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Throwable {
+                            Log.e(TAG, "Error guardando token: " + throwable.getMessage());
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            Log.e(TAG, "Error en saveToken: " + e.getMessage());
+        }
     }
 
     public String getToken() {
-        return sharedPreferences.getString(TOKEN_KEY, null);
+        try {
+            CompletableFuture<String> future = new CompletableFuture<>();
+
+            dataStore.data()
+                    .map(prefs -> prefs.get(TOKEN_KEY))
+                    .first("")
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            new Consumer<String>() {
+                                @Override
+                                public void accept(String token) throws Throwable {
+                                    future.complete(token != null && !token.isEmpty() ? token : null);
+                                }
+                            },
+                            new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) throws Throwable {
+                                    Log.e(TAG, "Error obteniendo token: " + throwable.getMessage());
+                                    future.complete(null);
+                                }
+                            }
+                    );
+
+            return future.get(2, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            Log.e(TAG, "Error en getToken: " + e.getMessage());
+            return null;
+        }
     }
 
     public void saveUserEmail(String email) {
-        sharedPreferences.edit()
-                .putString(EMAIL_KEY, email)
-                .apply();
-        Log.d(TAG, "Email de usuario guardado: " + email);
+        try {
+            dataStore.updateDataAsync(prefsIn -> {
+                MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
+                mutablePreferences.set(EMAIL_KEY, email);
+                return Single.just(mutablePreferences);
+            }).subscribe(
+                    new Consumer<Preferences>() {
+                        @Override
+                        public void accept(Preferences preferences) throws Throwable {
+                            Log.d(TAG, "Email de usuario guardado: " + email);
+                        }
+                    },
+                    new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Throwable {
+                            Log.e(TAG, "Error guardando email: " + throwable.getMessage());
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            Log.e(TAG, "Error en saveUserEmail: " + e.getMessage());
+        }
     }
 
     public String getUserEmail() {
-        return sharedPreferences.getString(EMAIL_KEY, null);
+        try {
+            CompletableFuture<String> future = new CompletableFuture<>();
+
+            dataStore.data()
+                    .map(prefs -> prefs.get(EMAIL_KEY))
+                    .first("")
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            new Consumer<String>() {
+                                @Override
+                                public void accept(String email) throws Throwable {
+                                    future.complete(email != null && !email.isEmpty() ? email : null);
+                                }
+                            },
+                            new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) throws Throwable {
+                                    Log.e(TAG, "Error obteniendo email: " + throwable.getMessage());
+                                    future.complete(null);
+                                }
+                            }
+                    );
+
+            return future.get(2, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            Log.e(TAG, "Error en getUserEmail: " + e.getMessage());
+            return null;
+        }
     }
 
     public void saveUserName(String name) {
-        sharedPreferences.edit()
-                .putString(USER_NAME_KEY, name)
-                .apply();
+        try {
+            dataStore.updateDataAsync(prefsIn -> {
+                MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
+                mutablePreferences.set(USER_NAME_KEY, name);
+                return Single.just(mutablePreferences);
+            }).subscribe(
+                    new Consumer<Preferences>() {
+                        @Override
+                        public void accept(Preferences preferences) throws Throwable {
+                            Log.d(TAG, "Nombre de usuario guardado: " + name);
+                        }
+                    },
+                    new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Throwable {
+                            Log.e(TAG, "Error guardando nombre: " + throwable.getMessage());
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            Log.e(TAG, "Error en saveUserName: " + e.getMessage());
+        }
     }
 
     public String getUserName() {
-        return sharedPreferences.getString(USER_NAME_KEY, null);
+        try {
+            CompletableFuture<String> future = new CompletableFuture<>();
+
+            dataStore.data()
+                    .map(prefs -> prefs.get(USER_NAME_KEY))
+                    .first("")
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            new Consumer<String>() {
+                                @Override
+                                public void accept(String name) throws Throwable {
+                                    future.complete(name != null && !name.isEmpty() ? name : null);
+                                }
+                            },
+                            new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) throws Throwable {
+                                    Log.e(TAG, "Error obteniendo nombre: " + throwable.getMessage());
+                                    future.complete(null);
+                                }
+                            }
+                    );
+
+            return future.get(2, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            Log.e(TAG, "Error en getUserName: " + e.getMessage());
+            return null;
+        }
     }
 
     public long getLoginTime() {
-        return sharedPreferences.getLong(LOGIN_TIME_KEY, 0);
+        try {
+            CompletableFuture<Long> future = new CompletableFuture<>();
+
+            dataStore.data()
+                    .map(prefs -> prefs.get(LOGIN_TIME_KEY))
+                    .first(0L)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            new Consumer<Long>() {
+                                @Override
+                                public void accept(Long time) throws Throwable {
+                                    future.complete(time != null ? time : 0L);
+                                }
+                            },
+                            new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) throws Throwable {
+                                    Log.e(TAG, "Error obteniendo tiempo de login: " + throwable.getMessage());
+                                    future.complete(0L);
+                                }
+                            }
+                    );
+
+            return future.get(2, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            Log.e(TAG, "Error en getLoginTime: " + e.getMessage());
+            return 0L;
+        }
     }
 
     public boolean isLoggedIn() {
@@ -78,14 +255,31 @@ public class TokenManager {
     public void clearToken() {
         String email = getUserEmail(); // Guardar para log
 
-        sharedPreferences.edit()
-                .remove(TOKEN_KEY)
-                .remove(EMAIL_KEY)
-                .remove(LOGIN_TIME_KEY)
-                .remove(USER_NAME_KEY)
-                .apply();
-
-        Log.d(TAG, "Sesión cerrada para usuario: " + (email != null ? email : "desconocido"));
+        try {
+            dataStore.updateDataAsync(prefsIn -> {
+                MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
+                mutablePreferences.remove(TOKEN_KEY);
+                mutablePreferences.remove(EMAIL_KEY);
+                mutablePreferences.remove(LOGIN_TIME_KEY);
+                mutablePreferences.remove(USER_NAME_KEY);
+                return Single.just(mutablePreferences);
+            }).subscribe(
+                    new Consumer<Preferences>() {
+                        @Override
+                        public void accept(Preferences preferences) throws Throwable {
+                            Log.d(TAG, "Sesión cerrada para usuario: " + (email != null ? email : "desconocido"));
+                        }
+                    },
+                    new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Throwable {
+                            Log.e(TAG, "Error limpiando token: " + throwable.getMessage());
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            Log.e(TAG, "Error en clearToken: " + e.getMessage());
+        }
     }
 
     // Método para verificar si la sesión ha expirado (opcional)
@@ -129,5 +323,20 @@ public class TokenManager {
         }
 
         return info.toString();
+    }
+
+    // Método para observar cambios en el token (útil para reactive programming)
+    public Flowable<String> observeToken() {
+        return dataStore.data()
+                .map(prefs -> prefs.get(TOKEN_KEY))
+                .distinctUntilChanged()
+                .subscribeOn(Schedulers.io());
+    }
+
+    // Método para observar el estado de login
+    public Flowable<Boolean> observeLoginState() {
+        return observeToken()
+                .map(token -> token != null && !token.trim().isEmpty())
+                .distinctUntilChanged();
     }
 }
