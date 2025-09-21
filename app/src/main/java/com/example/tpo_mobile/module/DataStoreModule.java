@@ -6,6 +6,8 @@ import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
 import androidx.datastore.rxjava3.RxDataStore;
 import androidx.datastore.preferences.core.Preferences;
 
+import com.example.tpo_mobile.utils.BiometricDataStore;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -24,5 +26,11 @@ public class DataStoreModule {
     @Singleton
     public RxDataStore<Preferences> provideDataStore(@ApplicationContext Context context) {
         return new RxPreferenceDataStoreBuilder(context, AUTH_PREFERENCES_NAME).build();
+    }
+
+    @Provides
+    @Singleton
+    public BiometricDataStore provideBiometricDataStore(@ApplicationContext Context context) {
+        return new BiometricDataStore(context);
     }
 }

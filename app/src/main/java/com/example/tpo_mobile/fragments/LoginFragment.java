@@ -58,9 +58,13 @@ public class LoginFragment extends Fragment {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
-        // Si ya está logueado, ir directamente al home
+        // Si ya está logueado, verificar si debe ir al home directamente
         if (tokenManager.isLoggedIn()) {
-            navigateToHome();
+            // Si tiene biometría configurada y válida, ir directamente
+            if (biometricAuthService.isBiometricConfigValidForCurrentUser()) {
+                navigateToHome();
+            }
+            // Si está logueado pero sin biometría válida, quedarse en login para reconfigurar
         }
     }
 
@@ -126,20 +130,25 @@ public class LoginFragment extends Fragment {
             if (biometricEmail != null && emailEditText.getText().toString().trim().isEmpty()) {
                 emailEditText.setText(biometricEmail);
             }
+
+            Log.d(TAG, "Botón biométrico configurado para usuario: " + biometricEmail);
         } else {
             biometricButton.setVisibility(View.GONE);
+            Log.d(TAG, "Botón biométrico oculto - Capaz: " + biometricAuthService.isDeviceBiometricCapable() +
+                    ", Tiene config: " + biometricAuthService.hasBiometricConfiguration());
         }
     }
 
     private void checkForAutoBiometricAuth() {
-        // Auto-activar biometría si está configurada y disponible
-        if (biometricAuthService.shouldRequestBiometricAuth()) {
+        // Auto-activar biometría si está configurada, disponible y el usuario no está aún logueado
+        if (!tokenManager.isLoggedIn() && biometricAuthService.shouldRequestBiometricAuth()) {
             // Delay pequeño para que la UI se estabilice
             new android.os.Handler().postDelayed(() -> {
                 if (getActivity() != null && !getActivity().isFinishing()) {
+                    Log.d(TAG, "Solicitando biometría automática");
                     performBiometricAuth();
                 }
-            }, 500);
+            }, 1000);
         }
     }
 
@@ -159,10 +168,20 @@ public class LoginFragment extends Fragment {
                     public void onBiometricAuthSuccess() {
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
-                                Log.d(TAG, "Autenticación biométrica exitosa, navegando al home");
+                                Log.d(TAG, "Autenticación biométrica exitosa");
                                 showLoading(false);
-                                Toast.makeText(requireContext(), "Autenticación biométrica exitosa", Toast.LENGTH_SHORT).show();
-                                navigateToHome();
+
+                                // Verificar que el usuario esté realmente logueado
+                                if (tokenManager.isLoggedIn()) {
+                                    Toast.makeText(requireContext(), "Acceso biométrico exitoso", Toast.LENGTH_SHORT).show();
+                                    navigateToHome();
+                                } else {
+                                    // Si la biometría fue exitosa pero no hay token, hay inconsistencia
+                                    Log.w(TAG, "Biometría exitosa pero no hay token válido");
+                                    biometricAuthService.clearBiometricConfiguration();
+                                    Toast.makeText(requireContext(), "Sesión expirada, inicia sesión nuevamente", Toast.LENGTH_LONG).show();
+                                    setupBiometricButton(); // Reconfigurar UI
+                                }
                             });
                         }
                     }
@@ -226,15 +245,11 @@ public class LoginFragment extends Fragment {
                         tokenManager.saveToken(result.getAccessToken());
                         tokenManager.saveUserEmail(email);
 
+                        Log.d(TAG, "Login exitoso para: " + email);
                         Toast.makeText(requireContext(), "Login exitoso", Toast.LENGTH_SHORT).show();
 
-                        // Preguntar si quiere habilitar biometría (solo si el dispositivo lo soporta)
-                        if (biometricAuthService.isDeviceBiometricCapable() &&
-                                !biometricAuthService.isBiometricAuthEnabled()) {
-                            showBiometricEnrollmentDialog();
-                        } else {
-                            navigateToHome();
-                        }
+                        // Verificar si debe habilitar/actualizar biometría
+                        handleBiometricAfterLogin(email);
                     });
                 }
             }
@@ -244,6 +259,7 @@ public class LoginFragment extends Fragment {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         showLoading(false);
+                        Log.e(TAG, "Error en login: " + error);
                         Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_LONG).show();
                     });
                 }
@@ -251,17 +267,40 @@ public class LoginFragment extends Fragment {
         });
     }
 
-    private void showBiometricEnrollmentDialog() {
+    private void handleBiometricAfterLogin(String email) {
+        // Si el dispositivo no soporta biometría, ir directamente al home
+        if (!biometricAuthService.isDeviceBiometricCapable()) {
+            navigateToHome();
+            return;
+        }
+
+        // Si ya tiene biometría habilitada para este usuario, actualizar y continuar
+        if (biometricAuthService.isBiometricAuthEnabled()) {
+            String biometricEmail = biometricAuthService.getBiometricUserEmail();
+            if (email.equals(biometricEmail)) {
+                // Mismo usuario, solo actualizar último uso y continuar
+                biometricAuthService.updateBiometricUserIfNeeded();
+                navigateToHome();
+                return;
+            } else {
+                // Usuario diferente, preguntar si quiere actualizar la configuración biométrica
+                showBiometricUpdateDialog(email);
+                return;
+            }
+        }
+
+        // No tiene biometría habilitada, preguntar si quiere activarla
+        showBiometricEnrollmentDialog(email);
+    }
+
+    private void showBiometricEnrollmentDialog(String email) {
         if (getActivity() == null) return;
 
         new androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle("Activar Autenticación Biométrica")
-                .setMessage("¿Quieres activar el acceso rápido con huella digital o reconocimiento facial para futuros inicios de sesión?")
+                .setMessage("¿Quieres activar el acceso rápido con huella digital o reconocimiento facial para futuros inicios de sesión?\n\nEsto te permitirá acceder más rápido la próxima vez.")
                 .setPositiveButton("Sí, activar", (dialog, which) -> {
-                    // Test biométrico para verificar que funciona
-                    if (getActivity() instanceof androidx.appcompat.app.AppCompatActivity) {
-                        testAndEnableBiometric();
-                    }
+                    testAndEnableBiometric(email);
                 })
                 .setNegativeButton("Ahora no", (dialog, which) -> {
                     navigateToHome();
@@ -270,7 +309,32 @@ public class LoginFragment extends Fragment {
                 .show();
     }
 
-    private void testAndEnableBiometric() {
+    private void showBiometricUpdateDialog(String email) {
+        if (getActivity() == null) return;
+
+        String currentBiometricEmail = biometricAuthService.getBiometricUserEmail();
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Actualizar Autenticación Biométrica")
+                .setMessage("La autenticación biométrica está configurada para otro usuario (" + currentBiometricEmail + ").\n\n¿Quieres actualizarla para tu cuenta actual (" + email + ")?")
+                .setPositiveButton("Sí, actualizar", (dialog, which) -> {
+                    testAndEnableBiometric(email);
+                })
+                .setNegativeButton("No, continuar sin biometría", (dialog, which) -> {
+                    navigateToHome();
+                })
+                .setNeutralButton("Desactivar biometría", (dialog, which) -> {
+                    biometricAuthService.clearBiometricConfiguration();
+                    Toast.makeText(requireContext(), "Biometría desactivada", Toast.LENGTH_SHORT).show();
+                    navigateToHome();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    private void testAndEnableBiometric(String email) {
+        Log.d(TAG, "Probando y habilitando biometría para: " + email);
+
         biometricAuthService.authenticateWithBiometric(
                 (androidx.appcompat.app.AppCompatActivity) getActivity(),
                 new BiometricAuthService.BiometricAuthCallback() {
@@ -278,8 +342,12 @@ public class LoginFragment extends Fragment {
                     public void onBiometricAuthSuccess() {
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
+                                // Habilitar biometría para este usuario
                                 biometricAuthService.enableBiometricAuth();
-                                Toast.makeText(requireContext(), "Autenticación biométrica activada", Toast.LENGTH_SHORT).show();
+
+                                Log.d(TAG, "Biometría habilitada exitosamente para: " + email);
+                                Toast.makeText(requireContext(), "Autenticación biométrica activada exitosamente", Toast.LENGTH_SHORT).show();
+
                                 navigateToHome();
                             });
                         }
@@ -289,6 +357,7 @@ public class LoginFragment extends Fragment {
                     public void onBiometricAuthError(String error) {
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
+                                Log.e(TAG, "Error activando biometría: " + error);
                                 Toast.makeText(requireContext(), "No se pudo activar biometría: " + error, Toast.LENGTH_LONG).show();
                                 navigateToHome();
                             });
@@ -299,6 +368,7 @@ public class LoginFragment extends Fragment {
                     public void onBiometricNotAvailable(String reason) {
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
+                                Log.w(TAG, "Biometría no disponible para activación: " + reason);
                                 Toast.makeText(requireContext(), "Biometría no disponible: " + reason, Toast.LENGTH_LONG).show();
                                 navigateToHome();
                             });
@@ -309,6 +379,7 @@ public class LoginFragment extends Fragment {
                     public void onBiometricAuthFailed() {
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
+                                Log.w(TAG, "Fallo al activar biometría");
                                 Toast.makeText(requireContext(), "No se reconoció la biometría", Toast.LENGTH_SHORT).show();
                                 navigateToHome();
                             });
@@ -351,6 +422,7 @@ public class LoginFragment extends Fragment {
 
     private void navigateToHome() {
         Intent intent = new Intent(getActivity(), AppGymActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         if (getActivity() != null) {
             getActivity().finish();
@@ -372,6 +444,15 @@ public class LoginFragment extends Fragment {
 
         // Reconfigurar botón biométrico cuando vuelve el fragment
         setupBiometricButton();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
+
+        // Debug: mostrar estado biométrico
+        biometricAuthService.logBiometricStatus();
     }
 
     @Override

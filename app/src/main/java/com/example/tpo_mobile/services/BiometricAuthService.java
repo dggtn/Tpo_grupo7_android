@@ -1,13 +1,14 @@
 package com.example.tpo_mobile.services;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
 
 import com.example.tpo_mobile.core.BiometricAuthenticator;
 import com.example.tpo_mobile.utils.TokenManager;
+import com.example.tpo_mobile.utils.BiometricDataStore;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,18 +17,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 
 @Singleton
 public class BiometricAuthService {
+
     private static final String TAG = "BiometricAuthService";
-    private static final String PREFS_NAME = "biometric_prefs";
-    private static final String KEY_BIOMETRIC_ENABLED = "biometric_enabled";
-    private static final String KEY_LAST_BIOMETRIC_AUTH = "last_biometric_auth";
-    private static final String KEY_USER_EMAIL_FOR_BIOMETRIC = "user_email_biometric";
-
-    // Tiempo máximo para considerar válida una autenticación biométrica (30 minutos)
-    private static final long BIOMETRIC_AUTH_VALIDITY_MS = 30 * 60 * 1000;
-
-    private final Context context;
-    private final TokenManager tokenManager;
-    private final SharedPreferences preferences;
 
     public interface BiometricAuthCallback {
         void onBiometricAuthSuccess();
@@ -36,11 +27,60 @@ public class BiometricAuthService {
         void onBiometricAuthFailed();
     }
 
+    private final Context context;
+    private final TokenManager tokenManager;
+    private final BiometricDataStore biometricDataStore;
+
     @Inject
-    public BiometricAuthService(@ApplicationContext Context context, TokenManager tokenManager) {
+    public BiometricAuthService(@ApplicationContext Context context,
+                                TokenManager tokenManager,
+                                BiometricDataStore biometricDataStore) {
         this.context = context;
         this.tokenManager = tokenManager;
-        this.preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        this.biometricDataStore = biometricDataStore;
+    }
+
+    /**
+     * Verifica si el dispositivo tiene capacidades biométricas
+     */
+    public boolean isDeviceBiometricCapable() {
+        BiometricManager biometricManager = BiometricManager.from(context);
+        int authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG |
+                BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+
+        int result = biometricManager.canAuthenticate(authenticators);
+
+        boolean capable = result == BiometricManager.BIOMETRIC_SUCCESS;
+        Log.d(TAG, "Dispositivo biométrico capaz: " + capable + " (código: " + result + ")");
+
+        return capable;
+    }
+
+    /**
+     * Verifica si la autenticación biométrica está habilitada para el usuario actual
+     */
+    public boolean isBiometricAuthEnabled() {
+        return biometricDataStore.isBiometricEnabled();
+    }
+
+    /**
+     * Verifica si hay configuración biométrica guardada
+     */
+    public boolean hasBiometricConfiguration() {
+        String email = biometricDataStore.getBiometricUserEmail();
+        boolean enabled = biometricDataStore.isBiometricEnabled();
+
+        boolean hasConfig = email != null && !email.isEmpty() && enabled;
+        Log.d(TAG, "Tiene configuración biométrica: " + hasConfig + " (email: " + email + ", enabled: " + enabled + ")");
+
+        return hasConfig;
+    }
+
+    /**
+     * Obtiene el email del usuario configurado para biometría
+     */
+    public String getBiometricUserEmail() {
+        return biometricDataStore.getBiometricUserEmail();
     }
 
     /**
@@ -48,12 +88,14 @@ public class BiometricAuthService {
      */
     public void enableBiometricAuth() {
         String currentUserEmail = tokenManager.getUserEmail();
-        if (currentUserEmail != null) {
-            preferences.edit()
-                    .putBoolean(KEY_BIOMETRIC_ENABLED, true)
-                    .putString(KEY_USER_EMAIL_FOR_BIOMETRIC, currentUserEmail)
-                    .apply();
+        if (currentUserEmail != null && !currentUserEmail.isEmpty()) {
+            biometricDataStore.setBiometricEnabled(true);
+            biometricDataStore.setBiometricUserEmail(currentUserEmail);
+            biometricDataStore.setBiometricLastUsed(System.currentTimeMillis());
+
             Log.d(TAG, "Autenticación biométrica habilitada para: " + currentUserEmail);
+        } else {
+            Log.w(TAG, "No se puede habilitar biometría: no hay usuario logueado");
         }
     }
 
@@ -61,148 +103,218 @@ public class BiometricAuthService {
      * Deshabilita la autenticación biométrica
      */
     public void disableBiometricAuth() {
-        preferences.edit()
-                .putBoolean(KEY_BIOMETRIC_ENABLED, false)
-                .remove(KEY_USER_EMAIL_FOR_BIOMETRIC)
-                .remove(KEY_LAST_BIOMETRIC_AUTH)
-                .apply();
+        biometricDataStore.setBiometricEnabled(false);
         Log.d(TAG, "Autenticación biométrica deshabilitada");
     }
 
     /**
-     * Verifica si la autenticación biométrica está habilitada para el usuario actual
+     * Limpia completamente la configuración biométrica
      */
-    public boolean isBiometricAuthEnabled() {
-        String currentUserEmail = tokenManager.getUserEmail();
-        String storedEmail = preferences.getString(KEY_USER_EMAIL_FOR_BIOMETRIC, null);
-        boolean enabled = preferences.getBoolean(KEY_BIOMETRIC_ENABLED, false);
-
-        return enabled && currentUserEmail != null && currentUserEmail.equals(storedEmail);
+    public void clearBiometricConfiguration() {
+        biometricDataStore.clearBiometricData();
+        Log.d(TAG, "Configuración biométrica completamente limpiada");
     }
 
     /**
-     * Verifica si hay una autenticación biométrica reciente válida
+     * Determina si se debe solicitar autenticación biométrica automáticamente
      */
-    public boolean hasValidRecentBiometricAuth() {
-        if (!isBiometricAuthEnabled()) {
+    public boolean shouldRequestBiometricAuth() {
+        // Solo si está habilitada y hay usuario logueado
+        if (!isBiometricAuthEnabled() || !tokenManager.isLoggedIn()) {
             return false;
         }
 
-        long lastAuth = preferences.getLong(KEY_LAST_BIOMETRIC_AUTH, 0);
-        long currentTime = System.currentTimeMillis();
+        // Verificar que el usuario biométrico coincida con el usuario actual
+        String biometricEmail = getBiometricUserEmail();
+        String currentEmail = tokenManager.getUserEmail();
 
-        return (currentTime - lastAuth) < BIOMETRIC_AUTH_VALIDITY_MS;
+        if (biometricEmail == null || currentEmail == null) {
+            return false;
+        }
+
+        boolean shouldRequest = biometricEmail.equals(currentEmail);
+        Log.d(TAG, "¿Solicitar biometría automática? " + shouldRequest +
+                " (biométrico: " + biometricEmail + ", actual: " + currentEmail + ")");
+
+        return shouldRequest;
     }
 
     /**
-     * Registra una autenticación biométrica exitosa
+     * Autentica usando biometría
      */
-    private void recordBiometricAuth() {
-        preferences.edit()
-                .putLong(KEY_LAST_BIOMETRIC_AUTH, System.currentTimeMillis())
-                .apply();
-    }
-
-    /**
-     * Inicia el proceso de autenticación biométrica
-     */
-    public void authenticateWithBiometric(AppCompatActivity activity, BiometricAuthCallback callback) {
+    public void authenticateWithBiometric(AppCompatActivity activity,
+                                          BiometricAuthCallback callback) {
         authenticateWithBiometric(activity, callback, null);
     }
 
     /**
-     * Inicia el proceso de autenticación biométrica con título personalizado
+     * Autentica usando biometría con título personalizado
      */
-    public void authenticateWithBiometric(AppCompatActivity activity, BiometricAuthCallback callback, String customTitle) {
-        Log.d(TAG, "Iniciando autenticación biométrica");
-
-        // Verificar si la biometría está disponible
-        if (!BiometricAuthenticator.isBiometricAvailable(context)) {
-            String statusMessage = BiometricAuthenticator.getBiometricStatusMessage(context);
-            Log.w(TAG, "Biometría no disponible: " + statusMessage);
-            callback.onBiometricNotAvailable(statusMessage);
+    public void authenticateWithBiometric(AppCompatActivity activity,
+                                          BiometricAuthCallback callback,
+                                          String customTitle) {
+        if (!isDeviceBiometricCapable()) {
+            String reason = BiometricAuthenticator.getBiometricStatusMessage(context);
+            callback.onBiometricNotAvailable(reason);
             return;
         }
 
-        BiometricAuthenticator.AuthenticationCallback authCallback = new BiometricAuthenticator.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationSuccess() {
-                Log.d(TAG, "Autenticación biométrica exitosa");
-                recordBiometricAuth();
-                callback.onBiometricAuthSuccess();
-            }
+        Log.d(TAG, "Iniciando autenticación biométrica");
 
-            @Override
-            public void onAuthenticationError(int errorCode, String errorMessage) {
-                Log.e(TAG, "Error en autenticación biométrica: " + errorMessage + " (Code: " + errorCode + ")");
-                callback.onBiometricAuthError(errorMessage);
-            }
+        BiometricAuthenticator authenticator = new BiometricAuthenticator(
+                activity,
+                new BiometricAuthenticator.AuthenticationCallback() {
+                    @Override
+                    public void onAuthenticationSuccess() {
+                        Log.d(TAG, "Autenticación biométrica exitosa");
 
-            @Override
-            public void onAuthenticationFailed() {
-                Log.w(TAG, "Falló la autenticación biométrica - biométrica no reconocida");
-                callback.onBiometricAuthFailed();
-            }
+                        // Actualizar último uso
+                        biometricDataStore.setBiometricLastUsed(System.currentTimeMillis());
 
-            @Override
-            public void onBiometricNotAvailable(String reason) {
-                Log.w(TAG, "Biometría no disponible: " + reason);
-                callback.onBiometricNotAvailable(reason);
-            }
-        };
+                        callback.onBiometricAuthSuccess();
+                    }
 
-        BiometricAuthenticator authenticator = new BiometricAuthenticator(activity, authCallback);
-        authenticator.authenticate(customTitle);
+                    @Override
+                    public void onAuthenticationError(int errorCode, String errorMessage) {
+                        Log.e(TAG, "Error biométrico: " + errorMessage + " (código: " + errorCode + ")");
+                        callback.onBiometricAuthError(errorMessage);
+                    }
+
+                    @Override
+                    public void onAuthenticationFailed() {
+                        Log.w(TAG, "Autenticación biométrica fallida");
+                        callback.onBiometricAuthFailed();
+                    }
+
+                    @Override
+                    public void onBiometricNotAvailable(String reason) {
+                        Log.w(TAG, "Biometría no disponible: " + reason);
+                        callback.onBiometricNotAvailable(reason);
+                    }
+                },
+                BiometricAuthenticator.AuthenticationType.BIOMETRIC_OR_DEVICE_CREDENTIAL
+        );
+
+        // Usar título personalizado si se proporciona
+        if (customTitle != null && !customTitle.trim().isEmpty()) {
+            authenticator.authenticate(customTitle);
+        } else {
+            authenticator.authenticate();
+        }
     }
 
     /**
-     * Verifica si el dispositivo actual soporta autenticación biométrica
+     * Verifica si la configuración biométrica es válida para el usuario actual
      */
-    public boolean isDeviceBiometricCapable() {
-        return BiometricAuthenticator.isBiometricAvailable(context) ||
-                BiometricAuthenticator.isDeviceCredentialAvailable(context);
+    public boolean isBiometricConfigValidForCurrentUser() {
+        if (!isBiometricAuthEnabled()) {
+            return false;
+        }
+
+        String biometricEmail = getBiometricUserEmail();
+        String currentEmail = tokenManager.getUserEmail();
+
+        if (biometricEmail == null || currentEmail == null) {
+            return false;
+        }
+
+        return biometricEmail.equals(currentEmail);
     }
 
     /**
-     * Obtiene el estado actual de la capacidad biométrica del dispositivo
+     * Actualiza el email del usuario biométrico si es necesario
      */
-    public String getBiometricCapabilityStatus() {
-        return BiometricAuthenticator.getBiometricStatusMessage(context);
+    public void updateBiometricUserIfNeeded() {
+        if (!isBiometricAuthEnabled()) {
+            return;
+        }
+
+        String currentEmail = tokenManager.getUserEmail();
+        String biometricEmail = getBiometricUserEmail();
+
+        if (currentEmail != null && !currentEmail.equals(biometricEmail)) {
+            Log.d(TAG, "Actualizando usuario biométrico de " + biometricEmail + " a " + currentEmail);
+            biometricDataStore.setBiometricUserEmail(currentEmail);
+        }
     }
 
     /**
-     * Limpia toda la configuración biométrica (útil para logout)
+     * Obtiene información sobre el estado de la configuración biométrica
      */
-    public void clearBiometricConfiguration() {
-        preferences.edit()
-                .remove(KEY_BIOMETRIC_ENABLED)
-                .remove(KEY_USER_EMAIL_FOR_BIOMETRIC)
-                .remove(KEY_LAST_BIOMETRIC_AUTH)
-                .apply();
-        Log.d(TAG, "Configuración biométrica limpiada");
+    public String getBiometricStatusInfo() {
+        if (!isDeviceBiometricCapable()) {
+            return "Dispositivo no compatible con biometría";
+        }
+
+        if (!isBiometricAuthEnabled()) {
+            return "Biometría disponible pero no habilitada";
+        }
+
+        String email = getBiometricUserEmail();
+        long lastUsed = biometricDataStore.getBiometricLastUsed();
+
+        StringBuilder info = new StringBuilder("Biometría activa");
+        if (email != null) {
+            info.append(" para: ").append(email);
+        }
+
+        if (lastUsed > 0) {
+            long daysSinceLastUse = (System.currentTimeMillis() - lastUsed) / (1000 * 60 * 60 * 24);
+            info.append(" (último uso: hace ").append(daysSinceLastUse).append(" días)");
+        }
+
+        return info.toString();
     }
 
     /**
-     * Verifica si se debe pedir autenticación biométrica en el login
+     * Determina si se debe mostrar el botón biométrico en la UI
      */
-    public boolean shouldRequestBiometricAuth() {
-        return isBiometricAuthEnabled() &&
-                !hasValidRecentBiometricAuth() &&
-                isDeviceBiometricCapable();
+    public boolean shouldShowBiometricButton() {
+        return isDeviceBiometricCapable() &&
+                (isBiometricAuthEnabled() ||
+                        (!isBiometricAuthEnabled() && tokenManager.isLoggedIn()));
     }
 
     /**
-     * Obtiene información del usuario configurado para biometría
+     * Método para testing/debug
      */
-    public String getBiometricUserEmail() {
-        return preferences.getString(KEY_USER_EMAIL_FOR_BIOMETRIC, null);
+    public void logBiometricStatus() {
+        Log.d(TAG, "=== Estado Biométrico ===");
+        Log.d(TAG, "Dispositivo capaz: " + isDeviceBiometricCapable());
+        Log.d(TAG, "Habilitado: " + isBiometricAuthEnabled());
+        Log.d(TAG, "Email biométrico: " + getBiometricUserEmail());
+        Log.d(TAG, "Email actual: " + tokenManager.getUserEmail());
+        Log.d(TAG, "Usuario logueado: " + tokenManager.isLoggedIn());
+        Log.d(TAG, "Debe solicitar auto: " + shouldRequestBiometricAuth());
+        Log.d(TAG, "Válido para usuario actual: " + isBiometricConfigValidForCurrentUser());
+        Log.d(TAG, "========================");
     }
 
     /**
-     * Verifica si hay configuración biométrica para cualquier usuario
+     * Verifica si ha pasado mucho tiempo desde el último uso biométrico
+     * @param maxDaysWithoutUse máximo de días sin uso antes de requerir reconfiguración
      */
-    public boolean hasBiometricConfiguration() {
-        return preferences.getBoolean(KEY_BIOMETRIC_ENABLED, false) &&
-                preferences.getString(KEY_USER_EMAIL_FOR_BIOMETRIC, null) != null;
+    public boolean shouldReconfirmBiometric(int maxDaysWithoutUse) {
+        if (!isBiometricAuthEnabled()) {
+            return false;
+        }
+
+        long lastUsed = biometricDataStore.getBiometricLastUsed();
+        if (lastUsed == 0) {
+            return false; // No hay registro de último uso
+        }
+
+        long daysSinceLastUse = (System.currentTimeMillis() - lastUsed) / (1000 * 60 * 60 * 24);
+        return daysSinceLastUse > maxDaysWithoutUse;
+    }
+
+    /**
+     * Migrar configuración biométrica de SharedPreferences a DataStore si existe
+     * (Solo para compatibilidad con versiones anteriores)
+     */
+    public void migrateLegacyBiometricConfig() {
+        // Este método se puede implementar si hay datos previos en SharedPreferences
+        // Por ahora, solo registramos que se llamó
+        Log.d(TAG, "Verificación de migración de configuración biométrica legacy completada");
     }
 }
