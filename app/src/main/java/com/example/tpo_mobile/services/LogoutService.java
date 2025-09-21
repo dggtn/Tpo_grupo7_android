@@ -25,12 +25,17 @@ public class LogoutService {
 
     private final AuthRepository authRepository;
     private final TokenManager tokenManager;
+    private final BiometricAuthService biometricAuthService;
     private final Context context;
 
     @Inject
-    public LogoutService(AuthRepository authRepository, TokenManager tokenManager, @ApplicationContext Context context) {
+    public LogoutService(AuthRepository authRepository,
+                         TokenManager tokenManager,
+                         BiometricAuthService biometricAuthService,
+                         @ApplicationContext Context context) {
         this.authRepository = authRepository;
         this.tokenManager = tokenManager;
+        this.biometricAuthService = biometricAuthService;
         this.context = context;
     }
 
@@ -38,19 +43,41 @@ public class LogoutService {
      * Realiza el logout completo: notifica al servidor y limpia datos locales
      */
     public void performLogout(LogoutCallback callback) {
-        Log.d(TAG, "Iniciando logout completo");
+        performLogout(callback, true);
+    }
+
+    /**
+     * Realiza el logout con opción de mantener configuración biométrica
+     * @param callback Callback para resultado
+     * @param clearBiometric true para limpiar config biométrica, false para mantenerla
+     */
+    public void performLogout(LogoutCallback callback, boolean clearBiometric) {
+        Log.d(TAG, "Iniciando logout completo (clearBiometric: " + clearBiometric + ")");
 
         authRepository.logout(new AuthRepository.AuthCallback<String>() {
             @Override
             public void onSuccess(String result) {
                 Log.d(TAG, "Logout exitoso en servidor: " + result);
+
+                // Limpiar configuración biométrica si se solicita
+                if (clearBiometric) {
+                    biometricAuthService.clearBiometricConfiguration();
+                    Log.d(TAG, "Configuración biométrica limpiada");
+                }
+
                 callback.onLogoutSuccess(result);
             }
 
             @Override
             public void onError(String error) {
                 Log.w(TAG, "Error en logout del servidor: " + error);
-                // Aún así considerar como exitoso porque se limpió localmente
+
+                // Aún así limpiar datos locales
+                if (clearBiometric) {
+                    biometricAuthService.clearBiometricConfiguration();
+                    Log.d(TAG, "Configuración biométrica limpiada tras error");
+                }
+
                 callback.onLogoutError(error);
             }
         });
@@ -60,10 +87,23 @@ public class LogoutService {
      * Logout rápido: solo limpia datos locales y navega
      */
     public void logoutLocalAndNavigateToLogin() {
-        Log.d(TAG, "Realizando logout local y navegación");
+        logoutLocalAndNavigateToLogin(true);
+    }
+
+    /**
+     * Logout local con opción de mantener configuración biométrica
+     * @param clearBiometric true para limpiar config biométrica, false para mantenerla
+     */
+    public void logoutLocalAndNavigateToLogin(boolean clearBiometric) {
+        Log.d(TAG, "Realizando logout local y navegación (clearBiometric: " + clearBiometric + ")");
 
         // Limpiar datos locales
         authRepository.logoutLocal();
+
+        if (clearBiometric) {
+            biometricAuthService.clearBiometricConfiguration();
+            Log.d(TAG, "Configuración biométrica limpiada en logout local");
+        }
 
         // Navegar al login
         navigateToLogin();
@@ -73,8 +113,29 @@ public class LogoutService {
      * Solo logout local sin navegación
      */
     public void logoutLocalOnly() {
-        Log.d(TAG, "Realizando solo logout local");
+        logoutLocalOnly(true);
+    }
+
+    /**
+     * Logout local sin navegación con opción de mantener configuración biométrica
+     * @param clearBiometric true para limpiar config biométrica, false para mantenerla
+     */
+    public void logoutLocalOnly(boolean clearBiometric) {
+        Log.d(TAG, "Realizando solo logout local (clearBiometric: " + clearBiometric + ")");
         authRepository.logoutLocal();
+
+        if (clearBiometric) {
+            biometricAuthService.clearBiometricConfiguration();
+            Log.d(TAG, "Configuración biométrica limpiada en logout local only");
+        }
+    }
+
+    /**
+     * Logout específico para cambio de usuario - mantiene capacidad de configurar biometría para otro usuario
+     */
+    public void logoutForUserSwitch(LogoutCallback callback) {
+        Log.d(TAG, "Logout para cambio de usuario - manteniendo estructura biométrica");
+        performLogout(callback, false); // No limpiar configuración biométrica completamente
     }
 
     /**
@@ -117,8 +178,8 @@ public class LogoutService {
     public void handleSessionExpired(LogoutCallback callback) {
         Log.w(TAG, "Sesión expirada, realizando logout automático");
 
-        // Limpiar datos locales inmediatamente
-        logoutLocalOnly();
+        // En caso de expiración, mantener configuración biométrica para re-login rápido
+        logoutLocalOnly(false);
 
         // Notificar
         if (callback != null) {
@@ -127,5 +188,29 @@ public class LogoutService {
 
         // Navegar al login
         navigateToLogin();
+    }
+
+    /**
+     * Obtiene información sobre el estado de la configuración biométrica
+     */
+    public String getBiometricConfigInfo() {
+        if (!biometricAuthService.isDeviceBiometricCapable()) {
+            return "Dispositivo sin soporte biométrico";
+        }
+
+        if (biometricAuthService.isBiometricAuthEnabled()) {
+            String email = biometricAuthService.getBiometricUserEmail();
+            return "Biometría activa para: " + (email != null ? email : "usuario actual");
+        }
+
+        return "Biometría disponible pero no configurada";
+    }
+
+    /**
+     * Verifica si se debe mostrar opción de login biométrico después del logout
+     */
+    public boolean shouldShowBiometricLoginAfterLogout() {
+        return biometricAuthService.isDeviceBiometricCapable() &&
+                biometricAuthService.hasBiometricConfiguration();
     }
 }

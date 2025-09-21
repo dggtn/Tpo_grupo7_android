@@ -297,7 +297,7 @@ public class TokenManager {
         return (currentTime - loginTime) > maxSessionTimeMillis;
     }
 
-    // Método para obtener información básica del usuario logueado
+    // Metodo para obtener información básica del usuario logueado
     public String getUserInfo() {
         if (!isLoggedIn()) {
             return "Usuario no logueado";
@@ -325,7 +325,7 @@ public class TokenManager {
         return info.toString();
     }
 
-    // Método para observar cambios en el token (útil para reactive programming)
+    // Metodo para observar cambios en el token
     public Flowable<String> observeToken() {
         return dataStore.data()
                 .map(prefs -> prefs.get(TOKEN_KEY))
@@ -333,7 +333,7 @@ public class TokenManager {
                 .subscribeOn(Schedulers.io());
     }
 
-    // Método para observar el estado de login
+    // Metodo para observar el estado de login
     public Flowable<Boolean> observeLoginState() {
         return observeToken()
                 .map(token -> token != null && !token.trim().isEmpty())
