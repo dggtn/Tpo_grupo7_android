@@ -11,8 +11,8 @@ import retrofit2.http.GET;
 
 public interface GymApiService {
 
-    @GET("shifts/available")
-    Call<ApiResponse<List<ClaseDTO>>> obtenerClases();
+//    @GET("shifts/available")
+//    Call<ApiResponse<List<ClaseDTO>>> obtenerClases();
 
     @GET("users")
     Call<ApiResponse<List<UserDTO>>> obtenerUsers();
@@ -20,4 +20,7 @@ public interface GymApiService {
     // Método para obtener el usuario autenticado actual
     @GET("users/me")
     Call<ApiResponse<UserDTO>> obtenerUserActual();
+    @GET("courses/allCourses")
+    Call<ApiResponse<List<ClaseDTO>>> obtenerClases();
+
 }

@@ -6,10 +6,13 @@ import android.util.Log;
 
 import com.example.tpo_mobile.data.api.GymApiService;
 import com.example.tpo_mobile.data.modelDTO.ApiResponse;
+import com.example.tpo_mobile.data.modelDTO.ClaseDTO;
 import com.example.tpo_mobile.data.modelDTO.UserDTO;
+import com.example.tpo_mobile.model.Clase;
 import com.example.tpo_mobile.model.User;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,8 +33,39 @@ public class GymRetrofitRepository implements GymRepository {
 
 
     @Override
-    public void getClasesByName(String name, GetAllClasesCallback callback) {
+    public void getClases( GetAllClasesCallback callback) {
+        this.api.obtenerClases().enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<ClaseDTO>>> call, Response<ApiResponse<List<ClaseDTO>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<List<ClaseDTO>> apiResponse = response.body();
 
+                    if (apiResponse.isSuccess() && apiResponse.getData() != null && !apiResponse.getData().isEmpty()) {
+                        List<ClaseDTO> clasesDTO = apiResponse.getData();
+                        List<Clase> clases = clasesDTO.stream().map((claseDTO)->{
+                            Clase clase = new Clase(claseDTO.getNombre());
+                            return clase;
+                        }).collect(Collectors.toList());
+                        Log.d(TAG, "se obtuvieron clases");
+                        callback.onSuccess(clases);
+                    } else {
+                        String error = "No se encontraron clases";
+                        Log.e(TAG, error);
+                        callback.onError(new RuntimeException(error));
+                    }
+                } else {
+                    String error = "Error al obtener lista de clases: " + response.code();
+                    Log.e(TAG, error);
+                    callback.onError(new RuntimeException(error));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<ClaseDTO>>> call, Throwable t) {
+                Log.e(TAG, "Error de conexión al obtener lista de usuarios: " + t.getMessage(), t);
+                callback.onError(t);
+            }
+        });
     }
 
     @Override
@@ -128,6 +162,8 @@ public class GymRetrofitRepository implements GymRepository {
 
         return new User(email, name);
     }
+
+
 
 
 }

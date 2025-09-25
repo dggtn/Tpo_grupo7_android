@@ -23,6 +23,7 @@ public class GymServiceImpl implements GymService {
 
     @Override
     public void getAllClases(GetAllClasesCallback callback) {
+        this.gymRepository.getClases(callback);
 
     }
 
@@ -31,10 +32,5 @@ public class GymServiceImpl implements GymService {
         Log.d(TAG, "Solicitando datos del usuario");
 
         this.gymRepository.getUser(callback);
-    }
-
-    //@Override
-    public void getClaseByName(String name, GetAllClasesCallback callback) {
-
     }
 }

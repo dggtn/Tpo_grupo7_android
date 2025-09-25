@@ -6,5 +6,5 @@ import com.example.tpo_mobile.repository.GetUserCallback;
 public interface GymService {
     void getAllClases(GetAllClasesCallback callback);
     void getUser(GetUserCallback callback);
-    //void getClaseByName(String name, ClasesServiceCallBack callback);
+
 }
