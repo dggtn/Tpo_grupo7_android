@@ -7,6 +7,7 @@ import com.example.tpo_mobile.data.api.GymApiService;
 import com.example.tpo_mobile.network.AuthInterceptor;
 
 import java.io.File;
+import java.time.Duration;
 
 import javax.inject.Singleton;
 
@@ -41,6 +42,7 @@ public class NetworkModule {
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         return new OkHttpClient.Builder()
+                .readTimeout(Duration.ofSeconds(30))
                 .addInterceptor(logging)
                 .addInterceptor(authInterceptor)
                 .cache(cache)
