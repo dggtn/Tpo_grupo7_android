@@ -27,4 +27,5 @@ public interface GymApiService {
     @GET("courses/{id}")
     Call<ApiResponse<ClaseDTO>> obtenerClaseById(@Path("id") Long claseId);
 
+
 }

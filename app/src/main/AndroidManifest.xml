@@ -37,6 +37,7 @@
             android:name=".activities.AppGymActivity"
             android:exported="false"
             android:theme="@style/Theme.Tpo_mobile"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

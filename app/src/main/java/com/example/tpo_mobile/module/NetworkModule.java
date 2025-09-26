@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.tpo_mobile.data.api.AuthApiService;
 import com.example.tpo_mobile.data.api.GymApiService;
+import com.example.tpo_mobile.data.api.ReservationApiService;
 import com.example.tpo_mobile.network.AuthInterceptor;
 
 import java.io.File;
@@ -18,62 +19,81 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 import dagger.hilt.components.SingletonComponent;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
 
 @Module
 @InstallIn(SingletonComponent.class)
 public class NetworkModule {
 
-    @Provides
-    @Singleton
+    // Emulador Android -> PC localhost
+    private static final String BASE_URL = "http://10.0.2.2:8080/";
+    // Dispositivo físico: usá la IP local de tu PC, ej:
+    // private static final String BASE_URL = "http://192.168.0.23:8080/";
+
+    @Provides @Singleton
     Cache provideCache(@ApplicationContext Context context) {
         int cacheSize = 10 * 1024 * 1024; // 10 MB
         File cacheDir = new File(context.getCacheDir(), "http-cache");
         return new Cache(cacheDir, cacheSize);
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     OkHttpClient provideOkHttpClient(Cache cache, AuthInterceptor authInterceptor) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        // En prod conviene ocultar el Authorization:
+        logging.redactHeader("Authorization");
 
         return new OkHttpClient.Builder()
-                .readTimeout(Duration.ofSeconds(30))
-                .addInterceptor(logging)
-                .addInterceptor(authInterceptor)
                 .cache(cache)
+                .readTimeout(Duration.ofSeconds(30))
+                .connectTimeout(Duration.ofSeconds(15))
+                .writeTimeout(Duration.ofSeconds(30))
+                .retryOnConnectionFailure(true)
+
+                // 1) Auth primero (para que TODAS las req tengan el Bearer)
+                .addInterceptor(authInterceptor)
+
+                // 2) Logging después (así ves la request final con headers)
+                .addInterceptor(logging)
+
+                // 3) Cache: reescribe encabezados SOLO en RESPUESTAS GET
                 .addNetworkInterceptor(chain -> {
-                    return chain.proceed(chain.request())
-                            .newBuilder()
-                            .header("Cache-Control", "public, max-age=60") // Cache por 60 segundos
-                            .build();
+                    Response resp = chain.proceed(chain.request());
+                    if ("GET".equalsIgnoreCase(chain.request().method())) {
+                        return resp.newBuilder()
+                                .header("Cache-Control", "public, max-age=60") // cache 60s
+                                .build();
+                    }
+                    return resp;
                 })
                 .build();
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     Retrofit provideRetrofit(OkHttpClient client) {
         return new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080/") // Para emulador Android - cambiar por tu IP del backend
+                .baseUrl(BASE_URL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     AuthApiService provideAuthApiService(Retrofit retrofit) {
         return retrofit.create(AuthApiService.class);
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     GymApiService provideGymApiService(Retrofit retrofit) {
         return retrofit.create(GymApiService.class);
+    }
+
+    @Provides @Singleton
+    ReservationApiService provideReservationApiService(Retrofit retrofit) {
+        return retrofit.create(ReservationApiService.class);
     }
 }

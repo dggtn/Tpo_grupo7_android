@@ -161,6 +161,14 @@ public class AuthRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<AuthResponse> apiResponse = response.body();
                     if (apiResponse.isSuccess() && apiResponse.getData() != null) {
+                        AuthResponse data = apiResponse.getData();
+
+                        // --- GUARDAR CREDENCIALES EN TOKENMANAGER ---
+                        // Ajustá getters según tu AuthResponse (token/email/nombre/userId)
+                        String token  = data.getAccessToken();     // p.ej. "accessToken" o "jwt"
+                        if (token != null && !token.trim().isEmpty()) {
+                            tokenManager.saveToken(token);
+                        }
                         callback.onSuccess(apiResponse.getData());
                     } else {
                         callback.onError(apiResponse.getError() != null ? apiResponse.getError() : "Error desconocido");
