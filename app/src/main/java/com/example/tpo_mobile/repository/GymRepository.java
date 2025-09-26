@@ -7,6 +7,8 @@ public interface GymRepository {
 
     void getClases( GetAllClasesCallback callback);
 
+    void obtenerClaseById(long id , GetClaseByIdCallback callback);
+
 
 }
 

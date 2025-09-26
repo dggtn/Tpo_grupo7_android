@@ -14,9 +14,23 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.tpo_mobile.R;
+import com.example.tpo_mobile.model.Clase;
+import com.example.tpo_mobile.repository.GetClaseByIdCallback;
+import com.example.tpo_mobile.services.GymService;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DetalleCursoFragment extends Fragment {
-    private String nombreCurso;
+
+    @Inject
+    GymService gymService;
+    private Long idCurso;
+
+    // COMPONENTES
+    private TextView tituloTextView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -24,7 +38,7 @@ public class DetalleCursoFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle argumentos = getArguments();
         if(argumentos != null){
-            nombreCurso = argumentos.getString("nombreCurso");
+            this.idCurso = argumentos.getLong("idCurso");
         }
     }
 
@@ -37,8 +51,7 @@ public class DetalleCursoFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        TextView textViewTituloCurso = view.findViewById(R.id.TituloNombreCurso);
-        textViewTituloCurso.setText(this.nombreCurso);
+        this.tituloTextView = view.findViewById(R.id.TituloNombreCurso);
 
         Button button2 = view.findViewById(R.id.reservaButton);
         button2.setOnClickListener((view2) -> {
@@ -46,6 +59,23 @@ public class DetalleCursoFragment extends Fragment {
             ;
         });
 
+        this.obtenerCurso();
+
+    }
+
+    private void obtenerCurso() {
+        // mostrar spinner
+        this.gymService.getClasePorId(this.idCurso, new GetClaseByIdCallback() {
+            @Override
+            public void onSuccess(Clase clase) {
+                tituloTextView.setText(clase.getNombre());
+            }
+
+            @Override
+            public void onError(Throwable error) {
+
+            }
+        });
     }
 
 }

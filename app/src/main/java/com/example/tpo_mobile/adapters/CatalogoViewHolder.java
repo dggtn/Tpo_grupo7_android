@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tpo_mobile.R;
 
 public class CatalogoViewHolder extends RecyclerView.ViewHolder {
+
+    private Long idCurso;
     public TextView textView;
     private Button botonVerDetalle;
     //  public ImageView imageView;
@@ -21,14 +23,16 @@ public class CatalogoViewHolder extends RecyclerView.ViewHolder {
         botonVerDetalle = itemView.findViewById(R.id.verDetalle);
         botonVerDetalle.setOnClickListener((vista) -> {
             Bundle argumentos = new Bundle();
-            argumentos.putString("nombreCurso", textView.getText().toString());
+            argumentos.putLong("idCurso", this.idCurso);
             Navigation.findNavController(vista).navigate(R.id.curso, argumentos);
         });
 
 //            imageView = itemView.findViewById(R.id.item_image);
     }
 
-
+    public void setIdCurso(Long idCurso) {
+        this.idCurso = idCurso;
+    }
 
     public void setTituloCurso(String titulo){
         textView.setText(titulo);

@@ -21,8 +21,8 @@
         android:label="Detalle del Curso"
         tools:layout="@layout/fragment_detalle_curso">
         <argument
-            android:name="nombreCurso"
-            app:argType="string"/>
+            android:name="idCurso"
+            app:argType="long"/>
         <action
             android:id="@+id/alert_reservaste"
             app:destination="@+id/fragment_dialog_reservaste"/>

@@ -8,6 +8,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 public interface GymApiService {
 
@@ -22,5 +23,8 @@ public interface GymApiService {
     Call<ApiResponse<UserDTO>> obtenerUserActual();
     @GET("courses/allCourses")
     Call<ApiResponse<List<ClaseDTO>>> obtenerClases();
+
+    @GET("courses/{id}")
+    Call<ApiResponse<ClaseDTO>> obtenerClaseById(@Path("id") Long claseId);
 
 }

@@ -43,7 +43,7 @@ public class GymRetrofitRepository implements GymRepository {
                     if (apiResponse.isSuccess() && apiResponse.getData() != null && !apiResponse.getData().isEmpty()) {
                         List<ClaseDTO> clasesDTO = apiResponse.getData();
                         List<Clase> clases = clasesDTO.stream().map((claseDTO)->{
-                            Clase clase = new Clase(claseDTO.getNombre());
+                            Clase clase = new Clase( claseDTO.getId() ,claseDTO.getName(),claseDTO.getFechaInicio(),claseDTO.getFechaFin(),claseDTO.getLength(),claseDTO.getPrice());
                             return clase;
                         }).collect(Collectors.toList());
                         Log.d(TAG, "se obtuvieron clases");
@@ -66,6 +66,42 @@ public class GymRetrofitRepository implements GymRepository {
                 callback.onError(t);
             }
         });
+    }
+
+    @Override
+    public void obtenerClaseById(long id, GetClaseByIdCallback callback) {
+        this.api.obtenerClaseById(id).enqueue(new Callback<ApiResponse<ClaseDTO>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ClaseDTO>> call, Response<ApiResponse<ClaseDTO>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<ClaseDTO> apiResponse = response.body();
+
+                    if (apiResponse.isSuccess() && apiResponse.getData() != null) {
+
+                        ClaseDTO claseDTO = apiResponse.getData();
+                        Clase clase = new Clase( claseDTO.getId() ,claseDTO.getName(),claseDTO.getFechaInicio(),claseDTO.getFechaFin(),claseDTO.getLength(),claseDTO.getPrice());
+
+                        Log.d(TAG, "se obtuvo la clase con id " + id);
+                        callback.onSuccess(clase);
+
+                    } else {
+                        String error = "No se encontro la clase con id " + id;
+                        Log.e(TAG, error);
+                        callback.onError(new RuntimeException(error));
+                    }
+                } else {
+                    String error = "Error al obtener la clase: " + response.code();
+                    Log.e(TAG, error);
+                    callback.onError(new RuntimeException(error));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ClaseDTO>> call, Throwable t) {
+                callback.onError(t);
+            }
+        });
+
     }
 
     @Override

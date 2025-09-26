@@ -31,8 +31,10 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull CatalogoViewHolder holder, int position) {
-        String nobreClase = this.clases.get(position).getName();
-        holder.setTituloCurso(nobreClase);
+        Clase clase = this.clases.get(position);
+        String nonbreClase = clase.getNombre();
+        holder.setIdCurso(clase.getId());
+        holder.setTituloCurso(nonbreClase);
     }
 
     @Override
