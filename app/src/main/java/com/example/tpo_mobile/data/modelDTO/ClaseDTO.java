@@ -9,9 +9,9 @@ public class ClaseDTO {
     private String fechaFin;
     private int length;
     private double  price;
-    private List[] sedes;
-    private List[] teachers;
-    private List[] shifts;
+    private List<?> sedes;
+    private List<?> teachers;
+    private List<ShiftDTO> shifts;
 
     public long getId() {
         return id;
@@ -21,7 +21,7 @@ public class ClaseDTO {
         this.id = id;
     }
 
-    public ClaseDTO(String name, String fechaInicio, String fechaFin, int length, double price, List[] teachers) {
+    public ClaseDTO(String name, String fechaInicio, String fechaFin, int length, double price, List<?> teachers) {
         this.name = name;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
@@ -70,30 +70,23 @@ public class ClaseDTO {
         this.price = price;
     }
 
-    public List[] getSedes() {
+    public List<?> getSedes() {
         return sedes;
     }
 
-    public void setSedes(List[] sedes) {
+    public void setSedes(List<?> sedes) {
         this.sedes = sedes;
     }
 
-    public List[] getTeachers() {
+    public List<?> getTeachers() {
         return teachers;
     }
 
-    public void setTeachers(List[] teachers) {
+    public void setTeachers(List<?> teachers) {
         this.teachers = teachers;
     }
 
-    public List[] getShifts() {
-        return shifts;
-    }
-
-    public void setShifts(List[] shifts) {
-        this.shifts = shifts;
-    }
-
-
+    public List<ShiftDTO> getShifts() { return shifts; }
+    public void setShifts(List<ShiftDTO> shifts) { this.shifts = shifts; }
 
 }

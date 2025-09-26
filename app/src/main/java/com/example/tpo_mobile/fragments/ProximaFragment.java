@@ -1,13 +1,11 @@
 package com.example.tpo_mobile.fragments;
 
-
+import android.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,12 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tpo_mobile.R;
-import com.example.tpo_mobile.repository.GetAllClasesCallback;
-import com.example.tpo_mobile.adapters.CatalogoAdapter;
-import com.example.tpo_mobile.model.Clase;
+import com.example.tpo_mobile.adapters.ProximasAdapter;
+import com.example.tpo_mobile.data.modelDTO.ReservationStatusDTO;
+import com.example.tpo_mobile.repository.SimpleCallback;
 import com.example.tpo_mobile.services.GymService;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -32,23 +30,11 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class ProximaFragment extends Fragment {
 
-    @Inject
-    GymService clasesService;
-    private ListView listView;
-    private List<String> claseDisplayList;
-    private ArrayAdapter<String> adapter;
+    @Inject GymService gymService;
 
-    private List<Clase> clasesMostradas;
-    private CatalogoAdapter catalogoAdapter;
-
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d("pantalla fragment", "On create pantalla fragment");
-
-        super.onCreate(savedInstanceState);
-
-    }
+    private RecyclerView recycler;
+    private TextView txtEmpty;
+    private ProximasAdapter adapter;
 
     @Nullable
     @Override
@@ -56,60 +42,64 @@ public class ProximaFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_proximos_clases, container, false);
     }
 
-    private void loadclases() {
-        clasesService.getAllClases(new GetAllClasesCallback() {
-            @Override
-            public void onSuccess(List<Clase> clases) {
-                clasesMostradas.clear();
-                clasesMostradas.addAll(clases);
-                requireActivity().runOnUiThread(() -> catalogoAdapter.notifyDataSetChanged());
-            }
+    @Override
+    public void onViewCreated(@NonNull View v, @Nullable Bundle s) {
+        super.onViewCreated(v, s);
 
-            @Override
-            public void onError(Throwable error) {
-                requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(),
-                        "Error al cargar clases: " + error.getMessage(),
-                        Toast.LENGTH_LONG).show());
+        recycler = v.findViewById(R.id.recyclerProximas);  // asegúrate que este id exista en el XML
+        txtEmpty = v.findViewById(R.id.txtEmpty);          // idem
+
+        recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
+        adapter = new ProximasAdapter();
+        recycler.setAdapter(adapter);
+
+        // Listener para botón Cancelar de cada item
+        adapter.setOnReservaActionListener(item -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Cancelar reserva")
+                    .setMessage("¿Querés cancelar tu reserva de \"" + item.getNombreCurso() + "\"?")
+                    .setPositiveButton("Sí", (d, w) -> cancelar(item))
+                    .setNegativeButton("No", null)
+                    .show();
+        });
+
+        cargar();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        cargar(); // refresca al volver
+    }
+
+    private void cargar() {
+        gymService.getProximasReservas(new SimpleCallback<List<ReservationStatusDTO>>() {
+            @Override public void onSuccess(List<ReservationStatusDTO> list) {
+                adapter.submit(list);
+                txtEmpty.setVisibility((list == null || list.isEmpty()) ? View.VISIBLE : View.GONE);
+            }
+            @Override public void onError(Throwable t) {
+                adapter.submit(Collections.emptyList());
+                txtEmpty.setVisibility(View.VISIBLE);
+                Toast.makeText(requireContext(), "Error cargando próximas: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        RecyclerView recyclerView = view.findViewById(R.id.recycle_catalog1);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        this.clasesMostradas = new ArrayList<>();
-        this.catalogoAdapter = new CatalogoAdapter(this.clasesMostradas);
-        recyclerView.setAdapter(this.catalogoAdapter);
-        loadclases();
-
-//        Button button = view.findViewById(R.id.verDetalle);
-//        button.setOnClickListener((view1) -> {
-//            Navigation.findNavController(view1).navigate(R.id.curso, new Bundle());
-//            ;
-//            listView = view.findViewById(R.id.listView);
-//            claseDisplayList = new ArrayList<>();
-//            adapter = new ArrayAdapter<>(requireContext(),
-//                    android.R.layout.simple_list_item_1,
-//                    claseDisplayList);
-//            listView.setAdapter(adapter);
-//            loadclases();
-//
-//            listView.setOnItemClickListener((parent, v, position, id) -> {
-//                String selectedClase = claseDisplayList.get(position);
-//                String claseName = selectedClase.split(" - ")[0];
-//
-//            });
-//        });
-
-
+    private void cancelar(ReservationStatusDTO item) {
+        Long shiftId = item.getShiftId(); // viene del DTO (lo agregamos en la opción B)
+        if (shiftId == null || shiftId <= 0) {
+            Toast.makeText(requireContext(), "Turno inválido", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        gymService.cancelarReserva(shiftId, new SimpleCallback<String>() {
+            @Override public void onSuccess(String s) {
+                Toast.makeText(requireContext(), "Reserva cancelada", Toast.LENGTH_SHORT).show();
+                cargar(); // recargar para que ahora figure como CANCELADA
+            }
+            @Override public void onError(Throwable t) {
+                Toast.makeText(requireContext(), "Error al cancelar: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
-
 }
-
-
-
-
-

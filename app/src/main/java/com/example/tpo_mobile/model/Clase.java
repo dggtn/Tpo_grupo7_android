@@ -1,5 +1,7 @@
 package com.example.tpo_mobile.model;
 
+import com.example.tpo_mobile.data.modelDTO.ShiftDTO;
+
 import java.util.List;
 
 public class Clase {
@@ -9,9 +11,9 @@ public class Clase {
     private String fechaFin;
     private int length;
     private double  price;
-    private List[] sedes;
-    private List[] teachers;
-    private List[] shifts;
+    private List<?> sedes;
+    private List<?> teachers;
+    private List<ShiftDTO> shifts;
 
 
     public Clase(long id, String nombre, String fechaInicio, String fechaFin, int length, double price) {
@@ -66,4 +68,7 @@ public class Clase {
     public long getId() {
         return id;
     }
+
+    public List<ShiftDTO> getShifts() { return shifts; }
+    public void setShifts(List<ShiftDTO> shifts) { this.shifts = shifts; }
 }
