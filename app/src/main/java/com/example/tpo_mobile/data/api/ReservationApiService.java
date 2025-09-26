@@ -2,6 +2,7 @@ package com.example.tpo_mobile.data.api;
 
 import com.example.tpo_mobile.data.modelDTO.ApiResponse;
 import com.example.tpo_mobile.data.modelDTO.ReservationDTO;
+import com.example.tpo_mobile.data.modelDTO.ReservationStatusDTO;
 
 import java.util.List;
 
@@ -22,4 +23,8 @@ public interface ReservationApiService {
 
     @GET("reservations")
     Call<ApiResponse<List<ReservationDTO>>> misReservas();
+
+    @GET("reservations/status")
+    Call<ApiResponse<List<ReservationStatusDTO>>> getProximas();
+
 }

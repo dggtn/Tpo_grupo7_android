@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_margin="12dp" android:elevation="2dp"
+    android:foreground="?attr/selectableItemBackground" android:clickable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="14dp" android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtTitulo"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textStyle="bold" android:textSize="18sp"
+            android:maxLines="2" android:ellipsize="end"/>
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/txtSub"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/btnCancelar"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Cancelar" android:visibility="gone"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

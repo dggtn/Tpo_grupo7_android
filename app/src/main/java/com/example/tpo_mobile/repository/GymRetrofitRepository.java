@@ -9,6 +9,7 @@ import com.example.tpo_mobile.data.api.ReservationApiService;
 import com.example.tpo_mobile.data.modelDTO.ApiResponse;
 import com.example.tpo_mobile.data.modelDTO.ClaseDTO;
 import com.example.tpo_mobile.data.modelDTO.ReservationDTO;
+import com.example.tpo_mobile.data.modelDTO.ReservationStatusDTO;
 import com.example.tpo_mobile.data.modelDTO.UserDTO;
 import com.example.tpo_mobile.model.Clase;
 import com.example.tpo_mobile.model.User;
@@ -317,6 +318,31 @@ public class GymRetrofitRepository implements GymRepository {
             }
         });
     }
+
+    public interface ProximasCallback {
+        void onSuccess(List<ReservationStatusDTO> list);
+        void onError(Throwable t);
+    }
+
+    public void getProximasReservas(SimpleCallback<List<ReservationStatusDTO>> callback) {
+        reservationApi.getProximas().enqueue(new Callback<ApiResponse<List<ReservationStatusDTO>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<ReservationStatusDTO>>> call,
+                                   Response<ApiResponse<List<ReservationStatusDTO>>> r) {
+                if (r.isSuccessful() && r.body() != null && r.body().isSuccess()) {
+                    callback.onSuccess(r.body().getData());
+                } else {
+                    callback.onError(new RuntimeException("Error listando próximas reservas"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<ReservationStatusDTO>>> call, Throwable t) {
+                callback.onError(t);
+            }
+        });
+    }
+
 
 
 

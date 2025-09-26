@@ -130,13 +130,28 @@ public class DetalleCursoFragment extends Fragment {
         }
         reservarBtn.setEnabled(false);
         gymService.reservar(shiftId, new SimpleCallback<String>() {
-            @Override public void onSuccess(String msg) {
+        /*    @Override public void onSuccess(String msg) {
                 Toast.makeText(getContext(), "Reserva confirmada", Toast.LENGTH_SHORT).show();
                 try {
                     Navigation.findNavController(requireView()).navigate(R.id.alert_reservaste, new Bundle());
                 } catch (Exception ignored) {}
                 reservarBtn.setEnabled(true);
+            }*/
+            @Override public void onSuccess(String msg) {
+                if (getContext() == null || getView() == null) return;
+
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("¡Reserva realizada!")
+                        .setMessage("Te esperamos 🙂")
+                        .setCancelable(false)
+                        .setPositiveButton("Aceptar", (d, w) -> {
+                            // Volver al Home (fragmentcatalogo) sin cerrar toda la app
+                            Navigation.findNavController(requireView())
+                                    .popBackStack(R.id.fragmentcatalogo, false);
+                        })
+                        .show();
             }
+
             @Override public void onError(Throwable error) {
                 Toast.makeText(getContext(), "No se pudo reservar: " + error.getMessage(), Toast.LENGTH_LONG).show();
                 reservarBtn.setEnabled(true);
