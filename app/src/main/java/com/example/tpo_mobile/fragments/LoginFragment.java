@@ -250,7 +250,7 @@ public class LoginFragment extends Fragment {
 
                         // Verificar si debe habilitar/actualizar biometría
                         handleBiometricAfterLogin(email);
-                        //navigateToHome();
+
                     });
                 }
             }
