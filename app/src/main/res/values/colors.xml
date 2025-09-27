@@ -7,4 +7,26 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Colores para Error Handler -->
+    <color name="error_red">#D32F2F</color>
+    <color name="error_red_light">#FFEBEE</color>
+    <color name="warning_orange">#FF9800</color>
+    <color name="warning_orange_light">#FFF3E0</color>
+
+    <!-- Colores de texto -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+
+    <!-- Colores de fondo -->
+    <color name="divider">#E0E0E0</color>
+
+    <!-- Colores de botones -->
+    <color name="primary_color">#1976D2</color>
+    <color name="primary_color_dark">#1565C0</color>
+    <color name="accent_color">#03DAC6</color>
+
+    <!-- Colores adicionales para botones -->
+    <color name="btn_secondary_bg">#F5F5F5</color>
+    <color name="btn_ghost_bg">@android:color/transparent</color>
 </resources>

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.example.tpo_mobile.session.SessionHolder;
+import com.example.tpo_mobile.utils.GlobalErrorHandler;
 
 import dagger.hilt.android.HiltAndroidApp;
 
@@ -28,8 +29,21 @@ public class AppApplication extends Application {
 
         // Aquí puedes agregar otras inicializaciones globales si es necesario
         // Por ejemplo: inicialización de librerías, configuración de crash reporting, etc.
+        // Configurar el manejador global de errores
+        setupGlobalErrorHandling();
 
         Log.d(TAG, "Aplicación inicializada correctamente");
+    }
+
+    private void setupGlobalErrorHandling() {
+        try {
+            // Configurar el manejador global para crashes no capturados
+            GlobalErrorHandler.setupGlobalErrorHandler(this);
+            Log.d(TAG, "Manejador global de errores configurado exitosamente");
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error configurando el manejador global de errores: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -49,8 +63,30 @@ public class AppApplication extends Application {
 
     @Override
     public void onLowMemory() {
+        Log.w(TAG, "Memoria baja detectada");
         super.onLowMemory();
-        Log.w(TAG, "Aplicación recibió advertencia de memoria baja");
-        // Aquí podrías limpiar caches o recursos no esenciales si fuera necesario
+
+        // Opcional: Limpiar caches o recursos no esenciales
+        System.gc();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+
+        switch (level) {
+            case TRIM_MEMORY_UI_HIDDEN:
+                Log.d(TAG, "UI oculta - liberando recursos UI");
+                break;
+            case TRIM_MEMORY_RUNNING_MODERATE:
+                Log.w(TAG, "Memoria moderadamente baja");
+                break;
+            case TRIM_MEMORY_RUNNING_LOW:
+                Log.w(TAG, "Memoria baja");
+                break;
+            case TRIM_MEMORY_RUNNING_CRITICAL:
+                Log.e(TAG, "Memoria críticamente baja");
+                break;
+        }
     }
 }

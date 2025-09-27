@@ -44,6 +44,24 @@
                 android:value=".activities.MainActivity" />
         </activity>
 
+        <!-- ErrorHandlerActivity - Pantalla de manejo de errores -->
+        <activity
+            android:name=".activities.ErrorHandlerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Tpo_mobile"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true">
+            <!--
+            Explicación de los atributos:
+            - launchMode="singleTop": Evita múltiples instancias de la pantalla de error
+            - taskAffinity="": Crea una nueva tarea para la pantalla de error
+            - excludeFromRecents="true": No aparece en la lista de apps recientes
+            - finishOnTaskLaunch="true": Se cierra cuando se inicia otra tarea
+            -->
+        </activity>
+
     </application>
 
 </manifest>
