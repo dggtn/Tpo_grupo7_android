@@ -57,7 +57,7 @@
 
             <!-- Profesor (mismo id) -->
             <TextView
-                android:id="@+id/profesor"
+                android:id="@+id/price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
@@ -67,7 +67,7 @@
 
             <!-- Título descripción (mismo id) -->
             <TextView
-                android:id="@+id/descripcion_curso"
+                android:id="@+id/fecha_inicio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
@@ -77,7 +77,7 @@
 
             <!-- Texto descripción (mismo id) -->
             <TextView
-                android:id="@+id/text_descripcion"
+                android:id="@+id/fecha_fin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -93,7 +93,7 @@
                 app:srcCompat="@drawable/pesas"
                 android:layout_marginBottom="20dp"/>
 
-        </LinearLayout>
+		</LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
     <!-- Botón fijo abajo (mismo id) -->

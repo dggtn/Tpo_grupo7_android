@@ -45,6 +45,10 @@ public class DetalleCursoFragment extends Fragment {
 
     private Button reservarBtn;
     private TextView tituloTextView;
+    private TextView duracionClaseTextView;
+    private TextView precioTextView;
+    private TextView fechaInicioView;
+    private TextView fechaFinView;
 
     private View scrim;
     private View spinner;
@@ -79,6 +83,10 @@ public class DetalleCursoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         this.tituloTextView = view.findViewById(R.id.TituloNombreCurso);
+        this.duracionClaseTextView = view.findViewById(R.id.minutos_clase);
+        this.precioTextView = view.findViewById(R.id.price);
+        this.fechaInicioView = view.findViewById(R.id.fecha_inicio);
+        this.fechaFinView = view.findViewById(R.id.fecha_fin);
         this.reservarBtn = view.findViewById(R.id.reservaButton);
         scrim = view.findViewById(R.id.progressScrim);
         spinner = view.findViewById(R.id.progressSpinner);
@@ -113,6 +121,16 @@ public class DetalleCursoFragment extends Fragment {
                 if (tituloTextView != null) {
                     tituloTextView.setText(clase.getNombre() != null ? clase.getNombre() : "Detalle del curso");
                 }
+
+                duracionClaseTextView.setText(clase.getLength() + " minutos");
+                precioTextView.setText(String.format("%.2f", clase.getPrice()));
+
+                String fechaInicio = "Fecha Inicio: " + clase.getFechaInicio();
+                String fechaFin = "Fecha Fin: " + clase.getFechaFin();
+
+                fechaInicioView.setText(fechaInicio);
+                fechaFinView.setText(fechaFin);
+
                 int cant = (clase.getShifts() != null) ? clase.getShifts().size() : 0;
                 Log.d("Detalle", "DTO cargado. shifts=" + cant);
                 reservarBtn.setEnabled(true);
