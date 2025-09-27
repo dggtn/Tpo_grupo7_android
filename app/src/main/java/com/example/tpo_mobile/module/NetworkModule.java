@@ -31,7 +31,7 @@ public class NetworkModule {
     // Emulador Android -> PC localhost
     private static final String BASE_URL = "http://10.0.2.2:8080/";
     // Dispositivo físico: usá la IP local de tu PC, ej:
-    // private static final String BASE_URL = "http://192.168.0.23:8080/";
+    //private static final String BASE_URL = "http://192.168.100.9:8080/";
 
     @Provides @Singleton
     Cache provideCache(@ApplicationContext Context context) {

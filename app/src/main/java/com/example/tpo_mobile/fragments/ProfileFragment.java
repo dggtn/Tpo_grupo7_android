@@ -20,6 +20,8 @@ import com.example.tpo_mobile.activities.MainActivity;
 import com.example.tpo_mobile.data.api.GymApiService;
 import com.example.tpo_mobile.data.modelDTO.ApiResponse;
 import com.example.tpo_mobile.data.modelDTO.UserDTO;
+import com.example.tpo_mobile.repository.SimpleCallback;
+import com.example.tpo_mobile.services.GymService;
 import com.example.tpo_mobile.services.LogoutService;
 import com.example.tpo_mobile.utils.TokenManager;
 
@@ -44,9 +46,40 @@ public class ProfileFragment extends Fragment {
     @Inject
     LogoutService logoutService;
 
+    @Inject
+    GymService gymService;
+
     private TextView email;
     private TextView firstName;
     private Button logoutButton;
+    private Button editName;
+
+    private final View.OnClickListener onEditName = (v ) -> {
+        Log.d(TAG, "Actualizando nombre de usuario");
+        String name = firstName.getText().toString();
+
+        UserDTO request = new UserDTO();
+        request.setName(name);
+
+        this.gymService.actualizarUsuario(request, new SimpleCallback<UserDTO>() {
+            @Override
+            public void onSuccess(UserDTO data) {
+                loadUsuario();
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Log.e(TAG, "Error de conexión: " + error.getMessage());
+                        Toast.makeText(requireContext(),
+                                "Error al cargar datos del usuario",
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        });
+    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,13 +103,15 @@ public class ProfileFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        firstName = view.findViewById(R.id.name_text_view);
+        firstName = view.findViewById(R.id.editText);
         email = view.findViewById(R.id.email_text_view);
+        editName = view.findViewById(R.id.editName);
         logoutButton = view.findViewById(R.id.logout_button);
     }
 
     private void setupListeners() {
         logoutButton.setOnClickListener(v -> showLogoutConfirmationDialog());
+        editName.setOnClickListener(onEditName);
     }
 
     private void loadUsuario() {
@@ -128,10 +163,9 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updateUserInfo(UserDTO user) {
-        if (user.getFirstName() != null && user.getLastName() != null) {
-            firstName.setText("Nombre: " + user.getFirstName() + " " + user.getLastName());
-        } else if (user.getFirstName() != null) {
-            firstName.setText("Nombre: " + user.getFirstName());
+
+        if (user.getFirstName() != null) {
+            firstName.setText(user.getFirstName());
         }
         if (user.getEmail() != null) {
             email.setText("Email: " + user.getEmail());

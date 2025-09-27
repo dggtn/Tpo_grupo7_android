@@ -3,6 +3,7 @@ package com.example.tpo_mobile.services;
 import com.example.tpo_mobile.data.modelDTO.ClaseDTO;
 import com.example.tpo_mobile.data.modelDTO.ReservationDTO;
 import com.example.tpo_mobile.data.modelDTO.ReservationStatusDTO;
+import com.example.tpo_mobile.data.modelDTO.UserDTO;
 import com.example.tpo_mobile.repository.GetAllClasesCallback;
 import com.example.tpo_mobile.repository.GetClaseByIdCallback;
 import com.example.tpo_mobile.repository.GetUserCallback;
@@ -21,6 +22,8 @@ public interface GymService {
     void getClaseDtoPorId(Long id, SimpleCallback<ClaseDTO> cb);
 
     void getProximasReservas(SimpleCallback<List<ReservationStatusDTO>> callback);
+
+    void actualizarUsuario(UserDTO user, SimpleCallback<UserDTO> callback);
 }
 
 

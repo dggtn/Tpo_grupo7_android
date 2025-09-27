@@ -7,7 +7,9 @@ import com.example.tpo_mobile.data.modelDTO.UserDTO;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface GymApiService {
@@ -26,6 +28,11 @@ public interface GymApiService {
 
     @GET("courses/{id}")
     Call<ApiResponse<ClaseDTO>> obtenerClaseById(@Path("id") Long claseId);
+
+    @PUT("users/update")
+    Call<ApiResponse<UserDTO>> actualizarUsuario(@Body UserDTO usuario);
+
+
 
 
 }

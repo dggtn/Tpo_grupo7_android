@@ -7,6 +7,7 @@ import android.util.Log;
 import com.example.tpo_mobile.data.modelDTO.ClaseDTO;
 import com.example.tpo_mobile.data.modelDTO.ReservationDTO;
 import com.example.tpo_mobile.data.modelDTO.ReservationStatusDTO;
+import com.example.tpo_mobile.data.modelDTO.UserDTO;
 import com.example.tpo_mobile.repository.GetAllClasesCallback;
 import com.example.tpo_mobile.repository.GetClaseByIdCallback;
 import com.example.tpo_mobile.repository.GetUserCallback;
@@ -68,5 +69,10 @@ public class GymServiceImpl implements GymService {
     @Override
     public void getProximasReservas(SimpleCallback<List<ReservationStatusDTO>> cb) {
         gymRepository.getProximasReservas(cb);
+    }
+
+    @Override
+    public void actualizarUsuario(UserDTO user, SimpleCallback<UserDTO> callback) {
+        gymRepository.actualizarUsuario(user, callback);
     }
 }

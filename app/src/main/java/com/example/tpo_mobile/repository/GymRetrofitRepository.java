@@ -342,6 +342,26 @@ public class GymRetrofitRepository implements GymRepository {
             }
         });
     }
+
+    @Override
+    public void actualizarUsuario(UserDTO user, SimpleCallback<UserDTO> callback) {
+        this.api.actualizarUsuario(user).enqueue(new Callback<ApiResponse<UserDTO>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<UserDTO>> call, Response<ApiResponse<UserDTO>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    callback.onSuccess(response.body().getData());
+                } else {
+                    callback.onError(new RuntimeException(extractErrorMessage(response)));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<UserDTO>> call, Throwable t) {
+                callback.onError(t);
+            }
+        });
+    }
+
     // ===== Helpers compatibles con Java 11 =====
     private String extractErrorMessage(retrofit2.Response<?> r) {
         try {
