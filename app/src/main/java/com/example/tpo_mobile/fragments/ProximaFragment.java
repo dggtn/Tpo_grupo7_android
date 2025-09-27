@@ -19,6 +19,7 @@ import com.example.tpo_mobile.adapters.ProximasAdapter;
 import com.example.tpo_mobile.data.modelDTO.ReservationStatusDTO;
 import com.example.tpo_mobile.repository.SimpleCallback;
 import com.example.tpo_mobile.services.GymService;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +37,17 @@ public class ProximaFragment extends Fragment {
     private TextView txtEmpty;
     private ProximasAdapter adapter;
 
+    private View scrim;
+    private View spinner;
+
+    private void showLoading(boolean show) {
+        if (!isAdded()) return;
+        int v = show ? View.VISIBLE : View.GONE;
+        if (scrim != null) scrim.setVisibility(v);
+        if (spinner != null) spinner.setVisibility(v);
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,8 +58,11 @@ public class ProximaFragment extends Fragment {
     public void onViewCreated(@NonNull View v, @Nullable Bundle s) {
         super.onViewCreated(v, s);
 
-        recycler = v.findViewById(R.id.recyclerProximas);  // asegúrate que este id exista en el XML
-        txtEmpty = v.findViewById(R.id.txtEmpty);          // idem
+        recycler = v.findViewById(R.id.recyclerProximas);
+        txtEmpty = v.findViewById(R.id.txtEmpty);
+        scrim = v.findViewById(R.id.proxProgressScrim);
+        spinner = v.findViewById(R.id.proxProgressSpinner);
+
 
         recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new ProximasAdapter();
@@ -58,7 +73,7 @@ public class ProximaFragment extends Fragment {
             new AlertDialog.Builder(requireContext())
                     .setTitle("Cancelar reserva")
                     .setMessage("¿Querés cancelar tu reserva de \"" + item.getNombreCurso() + "\"?")
-                    .setPositiveButton("Sí", (d, w) -> cancelar(item))
+                    .setPositiveButton("Sí", (d, w) -> cancelar(item.getShiftId()))
                     .setNegativeButton("No", null)
                     .show();
         });
@@ -86,20 +101,39 @@ public class ProximaFragment extends Fragment {
         });
     }
 
-    private void cancelar(ReservationStatusDTO item) {
-        Long shiftId = item.getShiftId(); // viene del DTO (lo agregamos en la opción B)
+    private void cancelar(Long shiftId) {
         if (shiftId == null || shiftId <= 0) {
-            Toast.makeText(requireContext(), "Turno inválido", Toast.LENGTH_SHORT).show();
+            showMessageDialog("Cancelar reserva", "Turno inválido.", null);
             return;
         }
+        showLoading(true);
         gymService.cancelarReserva(shiftId, new SimpleCallback<String>() {
-            @Override public void onSuccess(String s) {
-                Toast.makeText(requireContext(), "Reserva cancelada", Toast.LENGTH_SHORT).show();
-                cargar(); // recargar para que ahora figure como CANCELADA
+            @Override public void onSuccess(String msg) {
+                showLoading(false);
+                showMessageDialog("Reserva cancelada",
+                        (msg != null && !msg.trim().isEmpty()) ? msg : "Se canceló la reserva y se liberó el cupo.",
+                        ProximaFragment.this::cargar);
             }
-            @Override public void onError(Throwable t) {
-                Toast.makeText(requireContext(), "Error al cancelar: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            @Override public void onError(Throwable error) {
+                showLoading(false);
+                String em = (error != null && error.getMessage()!=null) ? error.getMessage()
+                        : "No se pudo cancelar la reserva.";
+                showMessageDialog("No se pudo cancelar", em, null);
             }
         });
     }
+
+    private void showMessageDialog(String title, String message, Runnable onOk) {
+        if (!isAdded()) return;
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Aceptar", (dialog, which) -> {
+                    dialog.dismiss();
+                    if (onOk != null) onOk.run();
+                })
+                .show();
+    }
+
 }

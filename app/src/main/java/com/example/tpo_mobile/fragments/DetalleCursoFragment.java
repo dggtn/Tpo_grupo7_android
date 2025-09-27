@@ -22,6 +22,7 @@ import com.example.tpo_mobile.model.Clase;
 import com.example.tpo_mobile.repository.GetClaseByIdCallback;
 import com.example.tpo_mobile.repository.SimpleCallback;
 import com.example.tpo_mobile.services.GymService;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,18 @@ public class DetalleCursoFragment extends Fragment {
     private Button reservarBtn;
     private TextView tituloTextView;
 
+    private View scrim;
+    private View spinner;
+
+    private void showLoading(boolean show) {
+        if (!isAdded()) return;
+        int v = show ? View.VISIBLE : View.GONE;
+        if (scrim != null) scrim.setVisibility(v);
+        if (spinner != null) spinner.setVisibility(v);
+        if (reservarBtn != null) reservarBtn.setEnabled(!show); // bloquea el tap doble
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d("pantalla fragment", "On create pantalla fragment");
@@ -67,6 +80,9 @@ public class DetalleCursoFragment extends Fragment {
 
         this.tituloTextView = view.findViewById(R.id.TituloNombreCurso);
         this.reservarBtn = view.findViewById(R.id.reservaButton);
+        scrim = view.findViewById(R.id.progressScrim);
+        spinner = view.findViewById(R.id.progressSpinner);
+
 
         reservarBtn.setEnabled(false);
 
@@ -125,36 +141,28 @@ public class DetalleCursoFragment extends Fragment {
 
     private void reservarShift(Long shiftId) {
         if (shiftId == null || shiftId <= 0) {
-            Toast.makeText(getContext(), "Turno inválido", Toast.LENGTH_SHORT).show();
+            showMessageDialog("Reserva", "Turno inválido.", null);
             return;
         }
+        showLoading(true);
         reservarBtn.setEnabled(false);
         gymService.reservar(shiftId, new SimpleCallback<String>() {
-        /*    @Override public void onSuccess(String msg) {
-                Toast.makeText(getContext(), "Reserva confirmada", Toast.LENGTH_SHORT).show();
-                try {
-                    Navigation.findNavController(requireView()).navigate(R.id.alert_reservaste, new Bundle());
-                } catch (Exception ignored) {}
-                reservarBtn.setEnabled(true);
-            }*/
             @Override public void onSuccess(String msg) {
-                if (getContext() == null || getView() == null) return;
-
-                new AlertDialog.Builder(requireContext())
-                        .setTitle("¡Reserva realizada!")
-                        .setMessage("Te esperamos 🙂")
-                        .setCancelable(false)
-                        .setPositiveButton("Aceptar", (d, w) -> {
-                            // Volver al Home (fragmentcatalogo) sin cerrar toda la app
-                            Navigation.findNavController(requireView())
-                                    .popBackStack(R.id.fragmentcatalogo, false);
-                        })
-                        .show();
+                showLoading(false);
+                reservarBtn.setEnabled(true);
+                showMessageDialog("¡Listo!", (msg != null && !msg.trim().isEmpty()) ? msg : "Reserva confirmada.", () -> {
+                    try {
+                        Navigation.findNavController(requireView())
+                                .navigate(R.id.fragmentcatalogo);
+                    } catch (Exception ignored) {}
+                });
             }
 
             @Override public void onError(Throwable error) {
-                Toast.makeText(getContext(), "No se pudo reservar: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                showLoading(false);
                 reservarBtn.setEnabled(true);
+                String em = (error != null && error.getMessage() != null) ? error.getMessage() : "No se pudo completar la reserva.";
+                showMessageDialog("No se pudo reservar", em, null);
             }
         });
     }
@@ -305,4 +313,19 @@ public class DetalleCursoFragment extends Fragment {
     }
 
     private static String toStr(Object o) { return (o == null) ? "" : String.valueOf(o); }
+
+    private void showMessageDialog(String title, String message, Runnable onOk) {
+        if (!isAdded()) return;
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Aceptar", (dialog, which) -> {
+                    dialog.dismiss();
+                    if (onOk != null) onOk.run();
+                })
+                .show();
+    }
+
+
 }
