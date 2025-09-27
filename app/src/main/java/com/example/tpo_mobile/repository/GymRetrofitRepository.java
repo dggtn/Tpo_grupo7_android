@@ -261,11 +261,11 @@ public class GymRetrofitRepository implements GymRepository {
                     reservationApi.reservar(dto).enqueue(new Callback<ApiResponse<String>>() {
                         @Override
                         public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> r) {
-                            if (r.isSuccessful() && r.body() != null && r.body().isSuccess()) {
-                                callback.onSuccess(r.body().getData());
-                            } else {
-                                callback.onError(new RuntimeException((r.body()!=null?r.body().getError():"Error reservando")));
-                            }
+                           if (r.isSuccessful() && r.body() != null && r.body().isSuccess()) {
+                               callback.onSuccess(r.body().getData() != null ? r.body().getData() : "Reserva creada");
+                           } else {
+                               callback.onError(new RuntimeException(extractErrorMessage(r)));
+                           }
                         }
                         @Override
                         public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
@@ -288,10 +288,10 @@ public class GymRetrofitRepository implements GymRepository {
         reservationApi.cancelar(shiftId).enqueue(new Callback<ApiResponse<String>>() {
             @Override
             public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> r) {
-                if (r.isSuccessful() && r.body()!=null && r.body().isSuccess()) {
-                    callback.onSuccess(r.body().getData());
+                if (r.isSuccessful() && r.body() != null && r.body().isSuccess()) {
+                    callback.onSuccess(r.body().getData() != null ? r.body().getData() : "Reserva cancelada");
                 } else {
-                    callback.onError(new RuntimeException((r.body()!=null?r.body().getData():"Error cancelando")));
+                    callback.onError(new RuntimeException(extractErrorMessage(r)));
                 }
             }
             @Override
@@ -329,11 +329,11 @@ public class GymRetrofitRepository implements GymRepository {
             @Override
             public void onResponse(Call<ApiResponse<List<ReservationStatusDTO>>> call,
                                    Response<ApiResponse<List<ReservationStatusDTO>>> r) {
-                if (r.isSuccessful() && r.body() != null && r.body().isSuccess()) {
-                    callback.onSuccess(r.body().getData());
-                } else {
-                    callback.onError(new RuntimeException("Error listando próximas reservas"));
-                }
+               if (r.isSuccessful() && r.body() != null && r.body().isSuccess()) {
+                   callback.onSuccess(r.body().getData());
+               } else {
+                   callback.onError(new RuntimeException(extractErrorMessage(r)));
+               }
             }
 
             @Override
@@ -342,6 +342,99 @@ public class GymRetrofitRepository implements GymRepository {
             }
         });
     }
+    // ===== Helpers compatibles con Java 11 =====
+    private String extractErrorMessage(retrofit2.Response<?> r) {
+        try {
+            // 1) Si vino un body válido con ApiResponse, revisar error ahí
+            if (r != null && r.body() != null) {
+                Object bodyObj = r.body();
+                if (bodyObj instanceof com.example.tpo_mobile.data.modelDTO.ApiResponse) {
+                    com.example.tpo_mobile.data.modelDTO.ApiResponse<?> api =
+                            (com.example.tpo_mobile.data.modelDTO.ApiResponse<?>) bodyObj;
+
+                    if (!api.isSuccess()) {
+                        if (api.getError() != null && !api.getError().trim().isEmpty()) {
+                            return normalizeError(api.getError());
+                        }
+                        Object data = api.getData();
+                        if (data instanceof String) {
+                            String s = (String) data;
+                            if (s != null && !s.trim().isEmpty()) {
+                                return normalizeError(s);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2) Si hay errorBody, intentar parsear como ApiResponse o devolver texto
+            if (r != null && r.errorBody() != null) {
+                String raw = r.errorBody().string();
+                if (raw != null && !raw.trim().isEmpty()) {
+                    try {
+                        com.google.gson.Gson g = new com.google.gson.Gson();
+                        com.example.tpo_mobile.data.modelDTO.ApiResponse api =
+                                g.fromJson(raw, com.example.tpo_mobile.data.modelDTO.ApiResponse.class);
+
+                        if (api != null) {
+                            if (api.getError() != null && !api.getError().trim().isEmpty()) {
+                                return normalizeError(api.getError());
+                            }
+                            Object data = api.getData();
+                            if (data instanceof String) {
+                                String s = (String) data;
+                                if (s != null && !s.trim().isEmpty()) {
+                                    return normalizeError(s);
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {
+                        // Si no parsea como ApiResponse, devolvemos el raw “limpio”
+                    }
+                    // fallback con el texto crudo (capado a 300 chars para no romper UI)
+                    String trimmed = raw.trim();
+                    return normalizeError(trimmed.length() > 300 ? trimmed.substring(0, 300) + "..." : trimmed);
+                }
+            }
+        } catch (Exception ignored) {
+            // Ignorar y pasar a fallback
+        }
+        return "No se pudo completar la operación. Intentá nuevamente.";
+    }
+
+    private String normalizeError(String serverMsg) {
+        if (serverMsg == null) return "Ocurrió un error inesperado.";
+        String m = serverMsg.toLowerCase();
+
+        // Reservar
+        if (m.contains("no quedan cupos") || m.contains("vacantes") || m.contains("cupo")) {
+            return "No quedan cupos disponibles para este turno.";
+        }
+        if (m.contains("ya está inscrito") || m.contains("ya tiene una reserva")) {
+            return "Ya tenés una reserva activa para esta clase.";
+        }
+        if (m.contains("tiempo límite") || m.contains("1 hora antes") || m.contains("límite")) {
+            return "El tiempo límite para reservar/cancelar ya pasó (1 hora antes del inicio).";
+        }
+        if (m.contains("usuario no encontrado") || m.contains("no se pudo obtener el usuario")) {
+            return "No pudimos identificar tu sesión. Iniciá sesión nuevamente.";
+        }
+
+        // Cancelar
+        if (m.contains("ya está cancelada") || m.contains("ya cancelada")) {
+            return "Esta reserva ya está cancelada.";
+        }
+        if (m.contains("expirada")) {
+            return "La reserva está expirada y no puede cancelarse.";
+        }
+        if (m.contains("no se encontró una reserva activa")) {
+            return "No encontramos una reserva activa para ese turno.";
+        }
+
+        // Fallback: mostrar lo que mandó el back (limpio)
+        return serverMsg.trim();
+    }
+
 
 
 
